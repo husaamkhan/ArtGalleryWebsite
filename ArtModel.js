@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 let artworkSchema = Schema({
@@ -34,10 +34,10 @@ let artworkSchema = Schema({
 });
 
 artworkSchema.methods.findArtwork = function(callback) {
-    this.model("Artwork").find()
-    .where("Artist").equals(this.name)
+    this.model('Artwork').find()
+    .where('Artist').equals(this.name)
     .exec
     .then(callback);
 };
 
-module.exports = mongoose.model("Gallery", artworkSchema);
+module.exports = mongoose.model('Artpiece', artworkSchema);

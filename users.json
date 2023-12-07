@@ -126,20 +126,6 @@
         "workshopsJoined": []
     },
     {
-        "username": "keithmallett",
-        "password": "keithmallett",
-        "name": "Keith Mallett",
-        "dob": "1948-10-07",
-        "following": [],
-        "followers": [],
-        "artist": true,
-        "artwork": [
-            "Rhapsody"
-        ],
-        "workshopsHosted": [],
-        "workshopsJoined": []
-    },
-    {
         "username": "artmind",
         "password": "artmind",
         "name": "ArtMind",
