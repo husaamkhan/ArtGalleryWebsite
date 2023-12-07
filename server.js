@@ -20,7 +20,7 @@ app.use(session({
     secret: 'some secret key here',  
     resave: true, 
     saveUninitialized: true, 
-    gallery: gallery 
+    gallery: gallery,
 }));
 
 app.use(function (req, res, next) { 
@@ -38,7 +38,12 @@ app.use('/users', userRouter);
 app.get('/', sendLogInPage);
 app.get('/register', sendRegistrationPage);
 
-function sendLogInPage(req, res, next) {
+async function sendLogInPage(req, res, next) {
+    if (req.session.loggedIn) {
+        res.redirect('/users/dashboard');
+        return;
+    }
+
     console.log('Sending Log In page');
     res.status(200).render('logIn');
 }

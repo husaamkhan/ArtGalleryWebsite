@@ -1,6 +1,7 @@
 function loadLogInPage() {
-    // Opens the register page
+    // Opens the register page when the register button is clicked
     document.getElementById('registerButton').addEventListener('click', function() { location.href = '/register' });
+    document.getElementById('logInButton').addEventListener('click', function() { requestLogIn(); });
 }
 
 function loadRegisterPage() {
@@ -32,6 +33,11 @@ function postRegister() {
         };
 
         let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                location.href = '/';
+            }
+        }
         xhttp.open('POST', '/users/register');
         xhttp.setRequestHeader('Content-Type', 'application/json');
         xhttp.send(JSON.stringify(accountInfo));
@@ -40,4 +46,30 @@ function postRegister() {
         alert("Invalid date entered!");
         document.getElementById('dob-input').style.border = '1px solid red'
     }
+}
+
+function requestLogIn() {
+    let username = document.getElementById('username-input').value;
+    let password = document.getElementById('password-input').value;
+
+    let credentials = {
+        username: username,
+        password: password
+    };
+
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 404) {
+            alert("Invalid credentials! Please try again.");
+            document.getElementById('username-input').style.border = '1px solid red';
+            document.getElementById('password-input').style.border = '1px solid red';
+        }
+
+        if (this.readyState == 4 && this.status == 200) {
+            location.href = '/users/dashboard';
+        }
+    }
+    xhttp.open('POST', '/users/logIn');
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send(JSON.stringify(credentials));
 }
