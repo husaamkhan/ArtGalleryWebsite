@@ -1,0 +1,33 @@
+body {
+    background-color:ghostwhite;
+    font-family: Helvetica;
+}
+
+
+
+div.form {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 25%;
+    padding: 2%;
+    background-color: rgb(240, 240, 240);
+}
+
+div.form p,
+div.form button {
+    margin: 0.6%;
+}
+
+div.form input {
+    margin-bottom: 4%;
+}
+
+div.form h4 {
+    margin: 0.6%;
+    text-align: center;
+}

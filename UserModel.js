@@ -5,55 +5,48 @@ let userSchema = Schema({
     username: {
         type: String,
         required: true,
-        unique: true,
+        unique: true
       },
       password: {
         type: String,
-        required: true,
+        required: true
       },
       name: {
         type: String,
-        required: true,
+        required: true
       },
       dob: {
         type: Date,
-        required: true,
+        required: true
       },
       following: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'User',
-        default: [],
+        default: []
       },
       followers: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'User',
-        default: [],
+        default: []
       },
       artist: {
         type: Boolean,
-        default: false,
+        default: false
       },
       artwork: {
         type: [String],
-        default: [],
+        default: []
       },
       workshopsHosted: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'Workshop',
-        default: [],
+        default: []
       },
       workshopsJoined: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'Workshop',
-        default: [],
+        default: []
       }
 });
-
-userSchema.methods.findArtwork = function(callback) {
-    this.model('Artwork').find()
-    .where('Artist').equals(this.name)
-    .exec
-    .then(callback);
-};
 
 module.exports = mongoose.model('User', userSchema);

@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 
 app.set('views', 'public');
+app.use(express.static('public'));
 app.set('view engine', 'pug');
 app.use(express.json());
 
@@ -27,26 +28,32 @@ app.use(function (req, res, next) {
     next(); 
 });
 
-// let userRouter = require('./user-router');
-// app.use('/users', userRouter);
+let userRouter = require('./user-router');
+app.use('/users', userRouter);
 // let galleryRouter = require('./gallery-router');
 // app.use('/galleries', galleryRouter);
 // let workshopRouter = require('./workshop-router');
 // app.use('/workshops', workshopRouter);
+ 
+app.get('/', sendLogInPage);
+app.get('/register', sendRegistrationPage);
 
-app.get('/', sendLogIn);
-
-function sendLogIn(req, res, next) {
+function sendLogInPage(req, res, next) {
     console.log('Sending Log In page');
     res.status(200).render('logIn');
 }
 
-mongoose.connect('mongodb://127.0.0.1/myDatabase');
+function sendRegistrationPage(req, res, next) {
+    console.log('Sending Registration Page')
+    res.status(200).render('register');
+}
+
+mongoose.connect('mongodb://127.0.0.1/gallaryDatabase');
 
 let db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
-    console.log("Connected to galleryDatabase database");
+    console.log('Connected to galleryDatabase database');
+    console.log('Server listening on port 3000');
     app.listen(3000);
-    console.log("Server listening on port 3000");
 });

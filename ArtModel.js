@@ -5,15 +5,15 @@ let artworkSchema = Schema({
       title: {
         type: String,
         required: true,
-        unique: true,
+        unique: true
       },
       artist: {
         type: String,
-        required: true,
+        required: true
       },
       year: {
         type: Number,
-        required: true,
+        required: true
       },
       category: {
         type: String,
@@ -32,12 +32,5 @@ let artworkSchema = Schema({
         required: true
       }
 });
-
-artworkSchema.methods.findArtwork = function(callback) {
-    this.model('Artwork').find()
-    .where('Artist').equals(this.name)
-    .exec
-    .then(callback);
-};
 
 module.exports = mongoose.model('Artpiece', artworkSchema);

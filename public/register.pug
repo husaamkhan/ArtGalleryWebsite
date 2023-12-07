@@ -1,0 +1,21 @@
+html
+    head
+        title Sign Up
+        script(src='/js/client.js')
+        link(rel='stylesheet', href='styles.css')
+    
+    body(class='formPage', onload='loadRegisterPage()')
+        div(class='form')
+            h4 Register
+            br
+            p Username:
+            input#username-input(type='text', value=username)
+            p Password:
+            input#password-input(type='password', value=password)
+            p First Name:
+            input#firstname-input(type='text')
+            p Last Name:
+            input#lastname-input(type='text')
+            p='Date of Birth (YYYY-MM-DD)'
+            input#dob-input(type'text')
+            button(id='registerButton') Register

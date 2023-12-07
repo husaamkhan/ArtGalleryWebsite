@@ -1,12 +1,17 @@
 html
     head
         title Sign In
+        script(src='/js/client.js')
+        link(rel='stylesheet', href='styles.css')
     
-    body
-        p Username
-        input(type="text")
-        p Password
-        input(type="text")
-        br
-        button Log In
-        button Register
+    body(class='formPage', onload='loadLogInPage()')
+        div(class='form')
+            h4 Log In
+            br
+            p Username:
+            input(type='text', id='username-input')
+            p Password:
+            input(type='password', id='password-input')
+            br
+            button(id='logInButton') Log In
+            button(id='registerButton') Register
