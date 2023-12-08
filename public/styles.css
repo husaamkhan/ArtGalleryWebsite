@@ -3,7 +3,16 @@ body {
     font-family: Helvetica;
 }
 
+div.header-div {
+    display: flex;
+    align-items: center;
+    background-color: rgb(240, 240, 240);
+    height: 7%;
+}
 
+a {
+    margin-right: 1%;
+}
 
 div.form {
     position: absolute;

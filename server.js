@@ -12,7 +12,7 @@ const session = require('express-session');
 const MongoDBGallery = require('connect-mongodb-session')(session); 
 
 const gallery = new MongoDBGallery({ 
-    uri: 'mongodb://127.0.0.1:27017/store', 
+    uri: 'mongodb://127.0.0.1:27017/gallaryDatabase', 
     collection: 'sessiondata' 
 }); 
 

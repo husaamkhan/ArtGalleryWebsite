@@ -8,7 +8,9 @@ let router = express.Router();
 router.post('/register', registerUser);
 router.post('/logIn', logInUser);
 
+router.get('/logOut', logOutUser);
 router.get('/dashboard', renderDashboard);
+
 
 async function registerUser(req, res, next) {
     console.log('Registering user');
@@ -34,7 +36,7 @@ async function logInUser(req, res, next) {
 
     if (user) {
         console.log('Found user with username: ' + username);
-        req.session.userId = user._id;
+        req.session.username = user.username;
         req.session.loggedIn = true;
 
         console.log('Sending dashboard page for ' + username);
@@ -46,17 +48,29 @@ async function logInUser(req, res, next) {
     }
 }
 
+function logOutUser(req, res, next) {
+    if (req.session.loggedIn) {
+        console.log("Logging out " + req.session.username);
+        req.session.loggedIn = false;
+        req.session.username = undefined;
+        res.status(200).redirect('/');
+        return;
+    }
+};
+
 async function renderDashboard(req, res, next) {
-    console.log("Finding user with id: " + req.session.userId);
-    const user = await User.findOne( { _id: req.session.userId });
-    
+    console.log("Finding user with username: " + req.session.username);
+    const user = await User.findOne( { username: req.session.username });
+
     if (user) {
         console.log("Found user " + user.name + ". Rendering dashboard");
         res.status(200).render('dashboard', { id: user._id, name: user.name });
+        return;
     }
     else {
         console.log("User not found");
-        res.status(404).send("User not found");
+        res.status(404).redirect('/');
+        return;
     }
 }
 
