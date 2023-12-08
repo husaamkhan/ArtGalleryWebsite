@@ -1,0 +1,34 @@
+html
+    head
+        title Add Artwork
+        script(src='/js/client.js')
+        link(rel='stylesheet', href='/styles.css')
+    
+    body(class='formPage', onload='loadAddArtworkPage()')
+        include header.pug
+        div(class='form')
+            h4 Add Artwork
+            br
+            p Title:
+            input#title-input(type='text')
+            p Year:
+            input#year-input(type='text')
+            p Category:
+            select#category-input
+                option Sculpture
+                option Technology
+                option Monument
+                option Painting
+                option Photography
+                option Illustration
+                option Embroidery
+                option DIY
+                option Mural
+                option Street Art
+            p Medium:
+            input#medium-input(type='text')
+            p Description:
+            input#description-input(type='text')
+            p Poster:
+            input#poster-input(type='poster')
+            button(id='submit-button') Submit

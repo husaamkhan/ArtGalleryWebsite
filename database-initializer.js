@@ -4,7 +4,7 @@ const Artpiece = require('./ArtModel');
 const User = require('./UserModel');
 const Workshop = require('./WorkshopModel');
 
-mongoose.connect('mongodb://127.0.0.1/gallaryDatabase');
+mongoose.connect('mongodb://127.0.0.1/galleryDatabase');
 let db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', async function () {

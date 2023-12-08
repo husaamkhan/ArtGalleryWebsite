@@ -1,0 +1,10 @@
+html
+    head
+        title Workshops You're Hosting
+        link(rel='stylesheet', href='/styles.css')
+
+    body
+        include header.pug
+        h2 Workshops You're Hosting
+        if workshopsHosted.length == 0 
+            p You aren't hosting any workshops!

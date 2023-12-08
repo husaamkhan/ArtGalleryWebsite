@@ -12,7 +12,7 @@ const session = require('express-session');
 const MongoDBGallery = require('connect-mongodb-session')(session); 
 
 const gallery = new MongoDBGallery({ 
-    uri: 'mongodb://127.0.0.1:27017/gallaryDatabase', 
+    uri: 'mongodb://127.0.0.1:27017/galleryDatabase', 
     collection: 'sessiondata' 
 }); 
 
@@ -30,8 +30,8 @@ app.use(function (req, res, next) {
 
 let userRouter = require('./user-router');
 app.use('/users', userRouter);
-// let galleryRouter = require('./gallery-router');
-// app.use('/galleries', galleryRouter);
+let galleryRouter = require('./gallery-router');
+app.use('/gallery', galleryRouter);
 // let workshopRouter = require('./workshop-router');
 // app.use('/workshops', workshopRouter);
  
@@ -53,7 +53,7 @@ function sendRegistrationPage(req, res, next) {
     res.status(200).render('register');
 }
 
-mongoose.connect('mongodb://127.0.0.1/gallaryDatabase');
+mongoose.connect('mongodb://127.0.0.1/galleryDatabase');
 
 let db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));

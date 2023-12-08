@@ -3,7 +3,7 @@ body {
     font-family: Helvetica;
 }
 
-div.header-div {
+div.header {
     display: flex;
     align-items: center;
     background-color: rgb(240, 240, 240);
@@ -11,6 +11,20 @@ div.header-div {
 }
 
 a {
+    margin-right: 1%;
+}
+
+li {
+    margin-bottom: 0.5%;
+}
+
+div.account-info {
+    background-color: rgb(240, 240, 240);
+    width: 40%;
+    padding: 1%;
+}
+
+label {
     margin-right: 1%;
 }
 
@@ -27,16 +41,25 @@ div.form {
     background-color: rgb(240, 240, 240);
 }
 
-div.form p,
-div.form button {
+p,
+button {
     margin: 0.6%;
 }
 
-div.form input {
+input {
+    margin-bottom: 4%;
+}
+
+select {
     margin-bottom: 4%;
 }
 
 div.form h4 {
     margin: 0.6%;
     text-align: center;
+}
+
+div.dashboard-options {
+    background-color: rgb(240, 240, 240);
+    padding: 0.25%;
 }

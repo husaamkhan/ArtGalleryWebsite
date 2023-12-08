@@ -1,0 +1,10 @@
+html
+    head
+        title Artist's You Follow
+        link(rel='stylesheet', href='/styles.css')
+
+    body
+        include header.pug
+        h2 Artists you follow
+        if following.length == 0 
+            p You aren't following any artists yet!

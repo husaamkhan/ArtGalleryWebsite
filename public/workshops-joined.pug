@@ -1,0 +1,10 @@
+html
+    head
+        title Workshops You've Joined
+        link(rel='stylesheet', href='/styles.css')
+
+    body
+        include header.pug
+        h2 Workshops You've Joined
+        if workshopsJoined.length == 0 
+            p You haven't joined any workshops yet!

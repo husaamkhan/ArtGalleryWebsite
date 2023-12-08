@@ -1,0 +1,35 @@
+html
+    head
+        title Account
+        script(src='/js/client.js')
+        link(rel='stylesheet', href='/styles.css')
+
+    body(onload='loadAccountPage()')
+        include header.pug
+        h2 Your Account
+
+        div(class='account-info')
+            if user.artist
+                label(for='switch-account-button') Account Type: Artist
+                button(id='switch-account-button') Downgrade to Patron
+            else
+                label(for='switch-account-button') Account Type: Patron
+                button(id='switch-account-button') Upgrade to Artist
+
+            br
+            label(for='username-input') Username:
+            input(type='text', id='username-input', value=user.username)
+            br
+            label(for='password-input') Password:
+            input(type='password', id='password-input', value=user.password)
+            br
+            label(for='firstname-input') First Name:
+            input(type='text', id='firstname-input', value=user.firstname)
+            br
+            label(for='lastname-input') Last Name:
+            input(type='text', id='lastname-input', value=user.lastname)
+            br
+            label(for='dob-input') Date of Birth (MM/DD/YYYY):
+            input(type='text', id='dob-input', value=user.dob.toLocaleDateString())
+            br
+            button(id='submit-button') Save Changes

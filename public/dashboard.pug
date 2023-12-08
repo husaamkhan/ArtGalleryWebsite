@@ -5,4 +5,24 @@ html
     
     body
         include header.pug
-        h3=`Welcome ${name}`
+        h2=`Welcome ${userInfo.firstname}`
+
+        div(class='dashboard-options')
+            ul
+                li
+                    a(href='/users/following') View artist you follow
+                li
+                    a(href='/users/workshops-joined') View workshops you have joined
+
+                if userInfo.artist
+                    li
+                        a(href='/users/workshops-hosted') View workshops you have hosted
+                    li
+                        a(href='/workshops/create-workshop') Create a workshop
+                    li
+                        a(href='/users/post-artpiece') Post an artpiece
+        
+        if userInfo.artist
+            h4 Your artwork
+            if userInfo.artwork.length == 0
+                p No posts yet!
