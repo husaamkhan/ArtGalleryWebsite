@@ -70,9 +70,11 @@ async function postArtpiece(req, res, next) {
         if (user) {
             console.log("Found user. Adding artwork");
             let artwork = req.body;
+
+            artwork._id = new ObjectId();
             artwork.artist = `${user.firstname} ${user.lastname}`;
 
-            user.artwork.push(artwork.title);
+            user.artwork.push(artwork._id);
 
             if (!user.artist) {
                 user.artist = !user.artist;
