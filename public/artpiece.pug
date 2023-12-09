@@ -1,0 +1,19 @@
+html
+    head
+        title=artpiece.title
+        link(rel='stylesheet', href='/styles.css')
+        
+    body
+        include header.pug
+
+        h2(class='artpiece-title')=artpiece.title
+        div(class='artpiece-container')
+            img(src=artpiece.poster, alt=`Picture of ${artpiece.title}`)
+            p=`Artist: ${artpiece.artist}`
+            p=`Year: ${artpiece.year}`
+            p=`Category: ${artpiece.category}`
+            p=`Medium: ${artpiece.medium}`
+        
+        if artpiece.description.length > 0
+            p='Description:'
+            p=artpiece.description

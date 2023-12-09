@@ -25,7 +25,7 @@ let artworkSchema = Schema({
       },      
       description: {
         type: String,
-        required: false
+        default: ''
       },
       poster: {
         type: String,

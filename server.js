@@ -39,7 +39,7 @@ app.get('/', sendLogInPage);
 app.get('/register', sendRegistrationPage);
 
 async function sendLogInPage(req, res, next) {
-    if (req.session.loggedIn) {
+    if (req.session.loggedIn) { // If the user is already logged in, redirect them to their dashboard rather than making them log in again
         res.redirect('/user/dashboard');
         return;
     }

@@ -38,12 +38,6 @@ db.once('open', async function () {
     }
 
     try {
-        // const userData = fs.readFileSync('./users.json'); // Read in data from users.json
-        // const users = JSON.parse(userData); 
-
-        // const result = await User.insertMany(users); // Insert the users into the User collection 
-        // console.log('Successfully inserted ' + result.length + ' users to Users');
-
         const gallery = await Gallery.find();
         let insertionCount = 0;
 
@@ -58,13 +52,15 @@ db.once('open', async function () {
                 lastname = `${splitName[1]} ${splitName[2]}`;
             }
 
-            let username = `${firstname.toLowerCase()}${lastname.toLowerCase()}`;
+            // Combines all parts of the name and makes them lower case
+            // e.g Vincent Van Gogh -> vincentvangogh
+            let username = `${splitName.join('').toLowerCase()}`; 
             let password = username; // Make username and password the same for simplicity when testing
-            
-            const user = await User.findOne({ username: username });
 
+            const user = await User.findOne({ username: username });
+            
             if (user) {
-                user.artwork.push(artpiece._id);
+                user.artwork.push(artpiece.title);
                 await user.save();
             }
 
@@ -78,6 +74,8 @@ db.once('open', async function () {
                 };
 
                 let newUser = new User(userInfo);
+                newUser.artwork.push(artpiece.title);
+
                 const result = await newUser.save();
 
                 if (result) {

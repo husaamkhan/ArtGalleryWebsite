@@ -14,6 +14,7 @@ function postRegister() {
     let firstname = document.getElementById('firstname-input').value;
     let lastname = document.getElementById('lastname-input').value;
 
+    // Turns the entered account information into JSON data to send to the server
     let accountInfo = {
         username: username,
         password: password,
@@ -25,6 +26,13 @@ function postRegister() {
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             alert('Registration successful! Redirecting to log in page');
+            location.href = '/';
+        }
+        else if(this.readyState == 4 && this.status == 400) {
+            alert('Username taken. Please choose a different username!');
+        }
+        else if (this.readyState == 4 & this.status == 500) {
+            alert('Internal server error. Registration unsuccessful!');
             location.href = '/';
         }
     }
@@ -66,6 +74,7 @@ function loadAccountPage() {
     submitButton.addEventListener('click', function() { submitChanges() });
     submitButton.disabled = true;
 
+    // The submit button is disabled until the user makes changes to their information
     document.getElementById('username-input').addEventListener('input', function() { submitButton.disabled = false });
     document.getElementById('password-input').addEventListener('input', function() { submitButton.disabled = false });
     document.getElementById('firstname-input').addEventListener('input', function() { submitButton.disabled = false });
@@ -77,8 +86,10 @@ function switchAccount() {
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             alert('Account switch successful');
-            location.reload();
+            location.reload(); // Reload the page so that it contains the updated information
         }
+        // 401 status indicates that the user is not able to switch accounts yet, so redirect them to add artwork page so that they can add art in order to
+        // become an artist
         else if (this.readyState == 4 && this.status == 401) {
             alert('You must post some artwork to become an artist!');
             location.href = '/gallery/add-artwork';
@@ -98,6 +109,7 @@ function submitChanges() {
     let firstname = document.getElementById('firstname-input').value;
     let lastname = document.getElementById('lastname-input').value;
 
+    // Convert the account info to JSON to send to the server
     let accountInfo = {
         username: username,
         password: password,
@@ -121,55 +133,71 @@ function submitChanges() {
 }
 
 function loadAddArtworkPage() {
-    document.getElementById('submit-button').addEventListener('click', function() { addArtWork() });
+    document.getElementById('submit-button').addEventListener('click', function() { validateArtpiece() });
 }
 
-function addArtWork() {
+function validateArtpiece() {
+    // Alert the user if they leave any fields empty
     if ( document.getElementById('title-input').value == '' || document.getElementById('year-input').value == '' ||
-        document.getElementById('medium-input').value == '' || document.getElementById('description-input').value == '' ||
-        document.getElementById('poster-input').value == '' ) {
+        document.getElementById('medium-input').value == '' || document.getElementById('poster-input').value == '' ) {
             alert("Please fill in all fields!");
     }
     else {
-        let title = document.getElementById('title-input').value;
-        let year = parseInt(document.getElementById('year-input').value);
-        let category = document.getElementById('category-input').value;
-        let medium = document.getElementById('medium-input').value;
-        let description = document.getElementById('description-input').value;
-        let poster = document.getElementById('poster-input').value;
-
-        let artworkInformation = {
-            title: title,
-            year: year,
-            category: category,
-            medium: medium,
-            description: description,
-            poster: poster
-        }
-
+        // check if gallery already contains an artpiece with this title
         let xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                let xhttp1 = new XMLHttpRequest();
-                xhttp1.onreadystatechange = function() {
-                    if (this.readyState == 4 && this.status == 200) {
-                        alert('Art added successfully');
-                        location.href = '/';
-                    }
-                }
-                xhttp1.open('POST', '/gallery/post-artpiece');
-                xhttp1.setRequestHeader('Content-Type', 'application/json');
-                xhttp1.send(this.responseText);
+                addArtWork(); // If not, add the artpice
             }
-            else if (this.readyState == 4 && this.status == 404) {
-                alert("User not found! Redirecting to log in page!");
-                location.href = '/';
+            else if (this.readyState == 4 && this.status == 400) {
+                alert('This title has already been taken');
             }
         }
-        xhttp.open('POST', '/user/post-artpiece');
-        xhttp.setRequestHeader('Content-Type', 'application/json');
-        xhttp.send(JSON.stringify(artworkInformation));
+        xhttp.open('GET', `/gallery/validate-art/${document.getElementById('title-input').value}`) // Send the title in the url
+        xhttp.send();
     }
+}
+
+function addArtWork() {
+    let title = document.getElementById('title-input').value;
+    let year = parseInt(document.getElementById('year-input').value);
+    let category = document.getElementById('category-input').value;
+    let medium = document.getElementById('medium-input').value;
+    let description = document.getElementById('description-input').value;
+    let poster = document.getElementById('poster-input').value;
+
+    let artworkInformation = {
+        title: title,
+        year: year,
+        category: category,
+        medium: medium,
+        description: description,
+        poster: poster
+    }
+
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            let xhttp1 = new XMLHttpRequest();
+            xhttp1.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    alert('Art added successfully');
+                    location.href = '/user/dashboard';
+                }
+            }
+            xhttp1.open('POST', '/gallery/post-artpiece');
+            xhttp1.setRequestHeader('Content-Type', 'application/json');
+            xhttp1.send(this.responseText);
+        }
+        else if (this.readyState == 4 && this.status == 404) {
+            alert("User not found! Redirecting to log in page!");
+            location.href = '/';
+        }
+    }
+    xhttp.open('POST', '/user/post-artpiece');
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send(JSON.stringify(artworkInformation));
+
 }
 
 function loadDashboard() {
@@ -179,36 +207,18 @@ function loadDashboard() {
         let xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                let artpieceIds = JSON.parse(this.responseText);
-                let queryString = artpieceIds.join(',')
-                let xhttp1 = new XMLHttpRequest();
-                xhttp1.onreadystatechange = function() {
-                    if (this.readyState == 4 && this.status == 200) {
-                        const artpieceList = JSON.parse(this.responseText);
-                        console.log(artpieceList)
-
-                        for (let i = 0; i < artpieceList.length; i++) {
-                            const li = document.createElement('li');
-        
-                            const a = document.createElement('a');
-                            a.href = `/gallery/view-art/${artpieceIds[i]}`;
-                            a.textContent = artpieceList[i].title;
-
-                            li.appendChild(a)
-                            ul.appendChild(li);
-                        }
-                    }
-                }
-                xhttp1.open('GET', `/gallery/get-artpieces?ids=${queryString}`);
-                xhttp1.setRequestHeader('Content-Type', 'application/json');
-                xhttp1.send();
-
+                let titles = JSON.parse(this.responseText);
                 
-            }
-            else if (this.readyState == 4 && this.status == 404) {
-                alert("User not found! Redirecting to log in page");
-                location.href = '/';
-            }
+                for (let title of titles) {
+                    const a = document.createElement('a');
+                    a.href = `/gallery/view-art/${title}`;
+                    a.textContent = title;
+
+                    const li = document.createElement('li');
+                    li.appendChild(a);
+                    ul.appendChild(li);
+                }
+            } 
         }
         xhttp.open('GET', '/user/artwork');
         xhttp.send();

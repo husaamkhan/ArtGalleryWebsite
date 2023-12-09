@@ -35,17 +35,16 @@ let userSchema = Schema({
 		default: false
 	},
 	artwork: {
-		type: [mongoose.Schema.Types.ObjectId],
-		ref: "Artpiece",
+		type: [String],
 		default: []
 	},
 	workshopsHosted: {
-		type: [mongoose.Schema.Types.ObjectId],
+		type: [String],
 		ref: "Workshop",
 		default: []
 	},
 	workshopsJoined: {
-		type: [mongoose.Schema.Types.ObjectId],
+		type: [String],
 		ref: "Workshop",
 		default: []
 	},
