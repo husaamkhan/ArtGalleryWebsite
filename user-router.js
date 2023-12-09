@@ -15,6 +15,8 @@ router.get('/account', renderAccount);
 router.get('/following', renderFollowing);
 router.get('/workshops-joined', renderWorkshopsJoined);
 router.get('/workshops-hosted', renderWorkshopsHosted);
+router.get('/artwork', sendArtwork);
+
 router.put('/switchAccount', switchAccount);
 router.put('/update', updateAccount);
 
@@ -109,17 +111,7 @@ async function renderDashboard(req, res, next) {
         if (user) {
             console.log('Found user ' + user.username + '. Rendering dashboard');
 
-            const userInfo = {
-                firstname: user.firstname,
-                artist: user.artist,
-                following: user.following,
-                workshopsHosted: user.workshopsHosted,
-                workshopsJoined: user.workshopsJoined,
-                artwork: user.artwork,
-                notifications: user.notifications
-            }
-
-            res.status(200).render('dashboard', { userInfo });
+            res.status(200).render('dashboard', { firstname: user.firstname, artist: user.artist, artworkLength: user.artwork.length });
             return;
         }
         else {
@@ -154,6 +146,30 @@ async function renderAccount(req, res, next) {
     }
     catch (err) {
         console.log('Error rendering account: ' + err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function sendArtwork(req, res, next) {
+    console.log('Finding user with username: ' + req.session.username);
+
+    try {
+        const user = await User.findOne( { username: req.session.username });
+
+        if (user) {
+            console.log('Found user ' + user.username + '. Sending artwork.');
+
+            res.status(200).send(JSON.stringify(user.artwork));
+            return;
+        }
+        else {
+            console.log('User not found');
+            res.status(404).redirect('/');
+            return;
+        }
+    }
+    catch (err) {
+        console.log('Error rendering workshops-hosted: ' + err);
         res.status(500).send('Internal server error');
     }
 }

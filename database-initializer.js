@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const fs = require('fs');
-const Artpiece = require('./ArtModel');
+const Gallery = require('./ArtModel');
 const User = require('./UserModel');
 const Workshop = require('./WorkshopModel');
 
@@ -30,19 +30,67 @@ db.once('open', async function () {
             gallery.push(document);
         }
 
-        const result = await Artpiece.insertMany(gallery); // Insert gallery list into Artpiece collection
-        console.log('Successfully inserted ' + result.length + ' art pieces to Gallery');
+        const result = await Gallery.insertMany(gallery); // Insert gallery list into Gallery collection
+        console.log('Successfully inserted ' + result.length + ' artpieces to Gallery');
     }
     catch(err) {
         console.log('Error initializing Gallery: ' + err);
     }
 
     try {
-        const userData = fs.readFileSync('./users.json'); // Read in data from users.json
-        const users = JSON.parse(userData); 
+        // const userData = fs.readFileSync('./users.json'); // Read in data from users.json
+        // const users = JSON.parse(userData); 
 
-        const result = await User.insertMany(users); // Insert the users into the User collection 
-        console.log('Successfully inserted ' + result.length + ' users to Users');
+        // const result = await User.insertMany(users); // Insert the users into the User collection 
+        // console.log('Successfully inserted ' + result.length + ' users to Users');
+
+        const gallery = await Gallery.find();
+        let insertionCount = 0;
+
+        for (let artpiece of gallery) {
+            let splitName = artpiece.artist.split(' ');
+            let firstname = splitName[0];
+            let lastname = '';
+            if (splitName.length == 2) {
+                lastname = splitName[1];
+            }
+            else if (splitName.length == 3) {
+                lastname = `${splitName[1]} ${splitName[2]}`;
+            }
+
+            let username = `${firstname.toLowerCase()}${lastname.toLowerCase()}`;
+            let password = username; // Make username and password the same for simplicity when testing
+            
+            const user = await User.findOne({ username: username });
+
+            if (user) {
+                user.artwork.push(artpiece._id);
+                await user.save();
+            }
+
+            else {
+                let userInfo = {
+                    username: username,
+                    password: password,
+                    firstname: firstname,
+                    lastname: lastname,
+                    artist: true
+                };
+
+                let newUser = new User(userInfo);
+                const result = await newUser.save();
+
+                if (result) {
+                    insertionCount++;
+                }
+                else {
+                    console.log("Error inserting users!");
+                    break;
+                }
+            }
+        }
+
+        console.log("Successfully inserted " + insertionCount + " users into User");
     }
     catch(err) {
         console.log('Error initializing Users: ' + err);

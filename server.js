@@ -29,7 +29,7 @@ app.use(function (req, res, next) {
 });
 
 let userRouter = require('./user-router');
-app.use('/users', userRouter);
+app.use('/user', userRouter);
 let galleryRouter = require('./gallery-router');
 app.use('/gallery', galleryRouter);
 // let workshopRouter = require('./workshop-router');
@@ -40,7 +40,7 @@ app.get('/register', sendRegistrationPage);
 
 async function sendLogInPage(req, res, next) {
     if (req.session.loggedIn) {
-        res.redirect('/users/dashboard');
+        res.redirect('/user/dashboard');
         return;
     }
 

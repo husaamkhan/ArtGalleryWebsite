@@ -1,28 +1,31 @@
 html
     head
         title Dashboard
+        script(src='/js/client.js')
         link(rel='stylesheet', href='/styles.css')
     
-    body
+    body(onload='loadDashboard()')
         include header.pug
-        h2=`Welcome ${userInfo.firstname}`
+        h2=`Welcome ${firstname}`
 
         div(class='dashboard-options')
             ul
                 li
-                    a(href='/users/following') View artist you follow
+                    a(href='/user/following') View artist you follow
                 li
-                    a(href='/users/workshops-joined') View workshops you have joined
+                    a(href='/user/workshops-joined') View workshops you have joined
 
-                if userInfo.artist
+                if artist
                     li
-                        a(href='/users/workshops-hosted') View workshops you have hosted
+                        a(href='/user/workshops-hosted') View workshops you have hosted
                     li
                         a(href='/workshops/create-workshop') Create a workshop
                     li
-                        a(href='/users/post-artpiece') Post an artpiece
+                        a(href='/user/post-artpiece') Post an artpiece
         
-        if userInfo.artist
+        if artist
             h4 Your artwork
-            if userInfo.artwork.length == 0
+            if artworkLength == 0
                 p No posts yet!
+            else
+                ul#artwork-list

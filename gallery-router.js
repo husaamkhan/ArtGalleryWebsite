@@ -6,6 +6,8 @@ const express = require('express');
 let router = express.Router();
 
 router.get('/add-artwork', renderAddArtwork);
+router.get('/get-artpieces', sendArtpieces);
+// router.get('/view-art/:artpiece-title', renderArtpiecePage);
 
 router.post('/post-artpiece', postArtpiece);
 
@@ -19,6 +21,21 @@ function renderAddArtwork(req, res, next) {
         console.log("Error: Not logged in");
         res.status(404).redirect('/');
         return;
+    }
+}
+
+async function sendArtpieces(req, res, next) {
+    try {
+        const ids = req.query.ids.split(',');
+        console.log("Got ids from client");
+
+        const result = await Gallery.find({ _id: { $in: ids }}, { title: 1, _id: 0 });
+        
+        res.status(200).send(JSON.stringify(result));
+    }
+    catch (err) {
+        console.log("Error sending artpieces: " + err);
+        res.status(500).send("Internal server error");
     }
 }
 

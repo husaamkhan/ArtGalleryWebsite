@@ -13,36 +13,24 @@ function postRegister() {
     let password = document.getElementById('password-input').value;
     let firstname = document.getElementById('firstname-input').value;
     let lastname = document.getElementById('lastname-input').value;
-    let dob = document.getElementById('dob-input').value;
 
-    let dobRegex = /^(0[1-9]|1[0-2])\/(0[1-9]|1[0-9]|2[1-9]|3[0-1])\/(\d{4})$/;
+    let accountInfo = {
+        username: username,
+        password: password,
+        firstname: firstname,
+        lastname: lastname,
+    };
 
-    // If the entered date of birth is valid, send the entered account information to the server to register this user
-    if (dobRegex.test(dob)) {
-        const [month, day, year] = dob.split('/');
-        let accountInfo = {
-            username: username,
-            password: password,
-            firstname: firstname,
-            lastname: lastname,
-            dob: new Date(year, month-1, day)
-        };
-
-        let xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                alert('Registration successful! Redirecting to log in page');
-                location.href = '/';
-            }
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            alert('Registration successful! Redirecting to log in page');
+            location.href = '/';
         }
-        xhttp.open('POST', '/users/register');
-        xhttp.setRequestHeader('Content-Type', 'application/json');
-        xhttp.send(JSON.stringify(accountInfo));
-    } 
-    else {
-        alert('Invalid date entered!');
-        document.getElementById('dob-input').style.border = '1px solid red'
     }
+    xhttp.open('POST', '/user/register');
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send(JSON.stringify(accountInfo));
 }
 
 function requestLogIn() {
@@ -63,10 +51,10 @@ function requestLogIn() {
         }
 
         if (this.readyState == 4 && this.status == 200) {
-            location.href = '/users/dashboard';
+            location.href = '/user/dashboard';
         }
     }
-    xhttp.open('POST', '/users/logIn');
+    xhttp.open('POST', '/user/logIn');
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.send(JSON.stringify(credentials));
 }
@@ -82,7 +70,6 @@ function loadAccountPage() {
     document.getElementById('password-input').addEventListener('input', function() { submitButton.disabled = false });
     document.getElementById('firstname-input').addEventListener('input', function() { submitButton.disabled = false });
     document.getElementById('lastname-input').addEventListener('input', function() { submitButton.disabled = false });
-    document.getElementById('dob-input').addEventListener('input', function() { submitButton.disabled = false });
 }
 
 function switchAccount() {
@@ -101,7 +88,7 @@ function switchAccount() {
             location.href = '/';
         }
     }
-    xhttp.open('PUT', '/users/switchAccount');
+    xhttp.open('PUT', '/user/switchAccount');
     xhttp.send();
 }
 
@@ -110,40 +97,27 @@ function submitChanges() {
     let password = document.getElementById('password-input').value;
     let firstname = document.getElementById('firstname-input').value;
     let lastname = document.getElementById('lastname-input').value;
-    let dob = document.getElementById('dob-input').value;
 
-    let dobRegex = /^(0[1-9]|1[0-2])\/(0[1-9]|1[0-9]|2[1-9]|3[0-1])\/(\d{4})$/;
+    let accountInfo = {
+        username: username,
+        password: password,
+        firstname: firstname,
+        lastname: lastname,
+    };
 
-    // If the entered date of birth is valid, send the entered account information to the server to update the user
-    if (dobRegex.test(dob)) {
-        const [month, day, year] = dob.split('/');
-        let accountInfo = {
-            username: username,
-            password: password,
-            firstname: firstname,
-            lastname: lastname,
-            dob: new Date(year, month-1, day)
-        };
-
-        let xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                alert('Changes saved successfully');
-                document.getElementById('dob-input').style.border = '1px solid black';
-            }
-            else if (this.readyState == 4 && this.status == 404) {
-                alert('Error! User not found! Redirecting to log in page.');
-                location.href = '/';
-            }
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            alert('Changes saved successfully');
         }
-        xhttp.open('PUT', '/users/update');
-        xhttp.setRequestHeader('Content-Type', 'application/json');
-        xhttp.send(JSON.stringify(accountInfo));
-    } 
-    else {
-        alert('Invalid date entered!');
-        document.getElementById('dob-input').style.border = '1px solid red';
+        else if (this.readyState == 4 && this.status == 404) {
+            alert('Error! User not found! Redirecting to log in page.');
+            location.href = '/';
+        }
     }
+    xhttp.open('PUT', '/user/update');
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send(JSON.stringify(accountInfo));
 }
 
 function loadAddArtworkPage() {
@@ -192,8 +166,51 @@ function addArtWork() {
                 location.href = '/';
             }
         }
-        xhttp.open('POST', '/users/post-artpiece');
+        xhttp.open('POST', '/user/post-artpiece');
         xhttp.setRequestHeader('Content-Type', 'application/json');
         xhttp.send(JSON.stringify(artworkInformation));
+    }
+}
+
+function loadDashboard() {
+    let ul = document.getElementById('artwork-list');
+
+    if(ul) {
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                let artpieceIds = JSON.parse(this.responseText);
+                let queryString = artpieceIds.join(',')
+                let xhttp1 = new XMLHttpRequest();
+                xhttp1.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        const artpieceList = JSON.parse(this.responseText);
+                        console.log(artpieceList)
+
+                        for (let i = 0; i < artpieceList.length; i++) {
+                            const li = document.createElement('li');
+        
+                            const a = document.createElement('a');
+                            a.href = `/gallery/view-art/${artpieceIds[i]}`;
+                            a.textContent = artpieceList[i].title;
+
+                            li.appendChild(a)
+                            ul.appendChild(li);
+                        }
+                    }
+                }
+                xhttp1.open('GET', `/gallery/get-artpieces?ids=${queryString}`);
+                xhttp1.setRequestHeader('Content-Type', 'application/json');
+                xhttp1.send();
+
+                
+            }
+            else if (this.readyState == 4 && this.status == 404) {
+                alert("User not found! Redirecting to log in page");
+                location.href = '/';
+            }
+        }
+        xhttp.open('GET', '/user/artwork');
+        xhttp.send();
     }
 }
