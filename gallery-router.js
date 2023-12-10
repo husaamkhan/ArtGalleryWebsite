@@ -9,6 +9,11 @@ router.get('/validate-art/:title', validateArtpiece);
 router.get('/view-art/:title', renderArtpiecePage);
 
 router.post('/post-artpiece', postArtpiece);
+router.post('/like/:title', like);
+router.post('/unlike/:title', unlike);
+router.post('/post-review/:title', postReview);
+
+router.delete('/delete-review/:title', deleteReview);
 
 function renderAddArtwork(req, res, next) {
     console.log('Rendering add artwork');
@@ -42,8 +47,6 @@ async function validateArtpiece(req, res, next) {
     try {
         console.log('Searching for artpiece with title: ' + req.params.title);
         const result = await Gallery.findOne({ title: req.params.title });
-
-        console.log(result);
 
         if (result) {
             console.log('Artpiece with title ' + req.params.title + ' already exists');
@@ -88,7 +91,6 @@ async function postArtpiece(req, res, next) {
         console.log("Saving art piece: " + artwork);
         await artwork.save() // Save the artwork to the gallery
         
-
         res.status(200).send("Artwork added successfully");
     }
     catch (err) {
@@ -99,6 +101,108 @@ async function postArtpiece(req, res, next) {
         }
         console.log("Error saving artwork: " + err);
         res.status(500).send("Internal server error");
+    }
+}
+
+async function like(req, res, next) {
+    try {
+        console.log("Searching for artpiece with title: " + req.params.title);
+        const artpiece = await Gallery.findOne({ title: req.params.title });
+
+        if (artpiece) {
+            console.log("Artpiece with title " + artpiece.title + " found");
+
+            artpiece.likes++;
+            await artpiece.save();
+            
+            res.status(200).send("Added like to artpiece successfully");
+        }
+        else {
+            console.log("Artpiece with title " + req.params.title + " not found");
+            res.status(404).send("Artpiece not found");
+        }
+    }
+    catch (err) {
+        console.log("Error adding like to artpiece");
+        res.status(500).send("Internal server error");
+    }
+}
+
+async function unlike(req, res, next) {
+    try {
+        console.log("Searching for artpiece with title: " + req.params.title);
+        const artpiece = await Gallery.findOne({ title: req.params.title });
+
+        if (artpiece) {
+            console.log("Artpiece with title " + artpiece.title + " found");
+
+            artpiece.likes--;
+            await artpiece.save();
+            
+            res.status(200).send("Removed like from artpiece successfully");
+        }
+        else {
+            console.log("Artpiece with title " + req.params.title + " not found");
+            res.status(404).send("Artpiece not found");
+        }
+    }
+    catch (err) {
+        console.log("Error removing like from artpiece");
+        res.status(500).send("Internal server error");
+    }
+}
+
+async function postReview(req, res, next) {
+    console.log("here");
+    try {
+        console.log("Searching for artpiece with title: " + req.params.title);
+        const artpiece = await Gallery.findOne({ title: req.params.title });
+
+        if (artpiece) {
+            console.log("Artpiece with title " + artpiece.title + " found, posting review");
+            
+            const review = { username: req.session.username, review: req.body.review };
+            artpiece.reviews.push(review);
+            await artpiece.save();
+            
+            res.status(200).send('Successfully added review to art piece');
+        }
+        else {
+            console.log("Artpiece with title " + req.params.title + " not found");
+            res.status(404).send("Artpiece not found");
+        }
+    }
+    catch (err) {
+        console.log("Error adding review to art piece: " + err);
+        res.status(500).send("Internal server error");
+    }
+}
+
+async function deleteReview(req, res, next) {
+    try {
+        console.log("Searching for artpiece with title: " + req.params.title);
+        let artpiece = await Gallery.findOne({ title: req.params.title });
+
+        console.log(artpiece);
+
+        if (artpiece) {
+            console.log("Artpiece with title " + artpiece.title + " found, deleting review");
+
+            artpiece.reviews = artpiece.reviews.filter(review => review.username != req.session.username);
+            await artpiece.save();
+
+            res.status(200).send('Successfully deleted review from artpiece');
+            return;
+        }
+        else {
+            console.log('Artpiece not found');
+            res.status(404).send('Artpiece not found');
+            return;
+        }
+    }
+    catch (err) {
+        console.log('Error deleting review from artpiece: ' + err);
+        res.status(500).send('Internal server error');
     }
 }
 

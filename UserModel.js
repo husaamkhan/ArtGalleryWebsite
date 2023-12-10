@@ -51,6 +51,14 @@ let userSchema = Schema({
 	notifications: {
 		type: [String],
 		default: []
+	},
+	likes: {
+		type: [String],
+		default: []
+	},
+	reviews: {
+		type: [String],
+		default: []
 	}
 });
 

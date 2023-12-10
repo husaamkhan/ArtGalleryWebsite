@@ -4,7 +4,7 @@ html
         script(src='/js/client.js')
         link(rel='stylesheet', href='/styles.css')
     
-    body(onload='loadDashboard()')
+    body
         include header.pug
         h2=`Welcome ${firstname}`
 
@@ -25,7 +25,26 @@ html
         
         if artist
             h4 Your artwork
-            if artworkLength == 0
+            if artwork.length == 0
                 p No posts yet!
             else
                 ul#artwork-list
+                    each artpiece in artwork
+                        li
+                            a(href=`/gallery/view-art/${artpiece}`)=artpiece
+        
+        div(class='dashboard-bottom')
+            div(class='notifications-container')
+                h4 Your notifications
+                if notifications.length == 0
+                        li No notifications yet!
+
+            div(class='likes-container')
+                h4 Your likes
+                if likes.length == 0
+                    li No likes yet!
+                else
+                    ul#likes-list
+                        each like in likes
+                            li
+                                a(href=`/gallery/view-art/${like}`)=like

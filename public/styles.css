@@ -42,7 +42,11 @@ div.form {
     background-color: rgb(240, 240, 240);
 }
 
-p,
+p {
+    margin:0.6%;
+    white-space: wrap;
+}
+
 button {
     margin: 0.6%;
 }
@@ -81,4 +85,21 @@ div.artpiece-container {
     margin: auto;
     text-align: center;
     display: block;
+}
+
+div.dashboard-bottom {
+    display: flex;
+    flex-direction: row;
+}
+
+div.notifications-container {
+    margin-right: 30%;   
+    padding: 1%; 
+}
+
+div.likes-container {
+    margin-left: 5%;
+    justify-content: left;
+    padding: 1%;
+    width: 30%;
 }

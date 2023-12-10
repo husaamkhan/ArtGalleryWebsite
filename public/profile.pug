@@ -1,0 +1,27 @@
+html
+    head
+        title artist.name
+        link(rel='stylesheet', href='/styles.css')
+        script(src='/js/client.js')
+    
+    body
+        include header.pug
+        h2=name
+
+        p=`${name}'s Art:`
+        if artwork.length > 0
+            ul
+                each artpiece in artwork
+                    li
+                        a(href=`/gallery/view-art/${artpiece}`)=artpiece
+        else
+            p=`${name} hasn't posted any art yet`
+        
+        p=`${name}'s Workshops:`
+        if workshops.length > 0
+            ul
+                each workshop in workshops
+                    li
+                        a(href=`/workshop/view-workshop/${workshop}`)=workshop
+        else
+            p=`${name} isn't hosting any workshops yet`

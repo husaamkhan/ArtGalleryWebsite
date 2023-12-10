@@ -2,18 +2,34 @@ html
     head
         title=artpiece.title
         link(rel='stylesheet', href='/styles.css')
+        script(src='/js/client.js')
         
-    body
+    body(onload='loadArtpiecePage()')
         include header.pug
 
-        h2(class='artpiece-title')=artpiece.title
-        div(class='artpiece-container')
+        h2#title-header(class='artpiece-title')=artpiece.title
+        div#artpiece-container(class='artpiece-container')
             img(src=artpiece.poster, alt=`Picture of ${artpiece.title}`)
-            p=`Artist: ${artpiece.artist}`
+            p
+             | Artist:
+             a(href=`/user/get-artist?artist=${artpiece.artist}&artpiece=${artpiece.title}`)=` ${artpiece.artist}`
             p=`Year: ${artpiece.year}`
             p=`Category: ${artpiece.category}`
             p=`Medium: ${artpiece.medium}`
+            p=`Likes: ${artpiece.likes}`
         
         if artpiece.description.length > 0
             p='Description:'
             p=artpiece.description
+        s
+        br
+        p Reviews:
+        if artpiece.reviews.length > 0
+            each review in artpiece.reviews
+                p=`${review.username}'s review:`
+                p=review.review
+                br
+        else
+            p No reviews yet!
+
+        

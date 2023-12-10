@@ -200,27 +200,145 @@ function addArtWork() {
 
 }
 
-function loadDashboard() {
-    let ul = document.getElementById('artwork-list');
+function loadArtpiecePage() {
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log(this.responseText);
+            let userInfo = JSON.parse(this.responseText);
 
-    if(ul) {
-        let xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                let titles = JSON.parse(this.responseText);
-                
-                for (let title of titles) {
-                    const a = document.createElement('a');
-                    a.href = `/gallery/view-art/${title}`;
-                    a.textContent = title;
+            // Doesnt add the like and review buttons if the user is the one that posted this art
+            if (!userInfo.artwork.includes(document.getElementById('title-header').textContent)) {
+                const likeButton = document.createElement("button");
+                const reviewButton = document.createElement("button");
 
-                    const li = document.createElement('li');
-                    li.appendChild(a);
-                    ul.appendChild(li);
+                if (userInfo.likes.includes(document.getElementById('title-header').textContent)) {
+                    likeButton.textContent = 'Unlike';
                 }
-            } 
+                else {
+                    likeButton.textContent = 'Like';
+                }
+
+                if (userInfo.reviews.includes(document.getElementById('title-header').textContent)) {
+                    reviewButton.textContent = "Remove review"
+                }
+                else {
+                    reviewButton.textContent = 'Add review';
+                }
+
+                reviewButton.addEventListener('click', function() { review(userInfo)} );
+                likeButton.addEventListener('click', function() { like(likeButton.textContent.toLowerCase()) });
+
+                document.getElementById('artpiece-container').appendChild(likeButton);
+                document.getElementById('artpiece-container').appendChild(reviewButton);
+            }
         }
-        xhttp.open('GET', '/user/artwork');
-        xhttp.send();
+        else if (this.readyState == 4 && this.status == 404) {
+            alert("User not found! Redirecting to log in!");
+            location.href = '/';
+        }
     }
+    xhttp.open('GET', '/user/get-user-info');
+    xhttp.send();
+}
+
+function review(userInfo) {
+    if (userInfo.reviews.includes(document.getElementById('title-header').textContent)) {
+        removeReview();
+    }
+    else {
+        // Puts the artpiece title in url query to be retrieved later
+        location.href = `/user/add-review?title=${document.getElementById('title-header').textContent}`;
+    }
+}
+
+function like(operation) {
+    let xhttpGallery = new XMLHttpRequest();
+    xhttpGallery.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 404) {
+            alert("Artpiece not found!");
+        }
+        else if (this.readyState == 4 && this.status == 200) {
+
+            let xhttpUser = new XMLHttpRequest();
+            xhttpUser.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    location.reload();
+                }
+               else if (this.readyState == 4 && this.status == 404) {
+                    alert("User not found! Redirecting to home page!");
+                    location.href = '/';
+                }
+            }
+            xhttpUser.open('POST', `/user/${operation}/${document.getElementById('title-header').textContent}`);
+            xhttpUser.send();
+
+        }
+    }
+    console.log(document.getElementById('title-header').textContent);
+    xhttpGallery.open('POST', `/gallery/${operation}/${document.getElementById('title-header').textContent}`);
+    xhttpGallery.send();    
+}
+
+function loadAddReviewPage() {
+    document.getElementById('submit-button').addEventListener('click', function() { addReview() });
+}
+
+function addReview() {
+    if (document.getElementById('review-input').value == '') {
+        alert('Please enter your review');
+    }
+    else {
+        // Get title from the url and split it up then join the words to remove unwanted characters
+        let title = location.href.split('?')[1];
+        title = title.split('=')[1];
+        title = title.split('%20').join(' ');
+
+        let xhttpUser = new XMLHttpRequest();
+        xhttpUser.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                let review = document.getElementById('review-input').value;
+
+                let xhttpGallery = new XMLHttpRequest();
+                xhttpGallery.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        location.href = `/gallery/view-art/${title}`;
+                    }
+                }
+                xhttpGallery.open('POST', `/gallery/post-review/${title}`);
+                xhttpGallery.setRequestHeader('Content-Type', 'application/json');
+                xhttpGallery.send(JSON.stringify({ review: review }));
+            }
+        }
+        xhttpUser.open('POST', `/user/post-review/${title}`) // gets the title from url query and posts review for that artpiece
+        xhttpUser.send();
+    }
+}
+
+function removeReview() {
+    // Get title from the url and split it up then join the words to remove unwanted characters
+    let title = document.getElementById('title-header').textContent;
+
+    let xhttpUser = new XMLHttpRequest();
+    xhttpUser.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            let xhttpGallery = new XMLHttpRequest();
+            xhttpGallery.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    // location.href = `/gallery/view-art/${title}`;
+                    location.reload();
+                }
+            }
+            xhttpGallery.open('DELETE', `/gallery/delete-review/${title}`)
+            xhttpGallery.send();
+        }
+        else if (this.readyState == 4 && this.status == 404) {
+            alert('404');
+        }
+        else if (this.readyState == 4 && this.status == 500) {
+            alert('500');
+        }
+    }
+    xhttpUser.open('DELETE', `/user/delete-review/${title}`);
+    xhttpUser.send();
 }

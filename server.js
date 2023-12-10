@@ -3,7 +3,7 @@ const app = express();
 
 app.set('views', 'public');
 app.use(express.static('public'));
-app.set('view engine', 'pug');
+app.set('view engine', 'pug');8
 app.use(express.json());
 
 const mongoose = require('mongoose');
@@ -59,6 +59,6 @@ let db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
     console.log('Connected to galleryDatabase database');
-    console.log('Server listening on port 3000');
     app.listen(3000);
+    console.log('Server listening on port 3000');
 });

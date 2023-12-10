@@ -1,0 +1,12 @@
+html
+    head
+        title Post a Review
+        link(rel='stylesheet', href='/styles.css')
+        script(src='/js/client.js')
+    
+    body(onload='loadAddReviewPage()')
+        include header.pug
+        h4 Post a Review
+        textarea(id='review-input', name='review-input', cols='100', placeholder='Type your review here...')
+        br
+        button#submit-button Submit

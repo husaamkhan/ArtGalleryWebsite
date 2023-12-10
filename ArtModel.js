@@ -30,6 +30,19 @@ let artworkSchema = Schema({
       poster: {
         type: String,
         required: true
+      },
+      likes: {
+        type: Number,
+        default: 0
+      },
+      reviews: {
+        type: [
+          {
+            username: String,
+            review: String
+          }
+        ],
+        default: []
       }
 });
 
