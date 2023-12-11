@@ -21,12 +21,11 @@ let userSchema = Schema({
 		default: ''
 	},
 	following: {
-		type: [mongoose.Schema.Types.ObjectId],
-		ref: 'User',
+		type: [String],
 		default: []
 	},
 	followers: {
-		type: [mongoose.Schema.Types.ObjectId],
+		type: [String],
 		ref: 'User',
 		default: []
 	},

@@ -17,6 +17,15 @@ db.once('open', async function () {
 
         // For each artpiece in gallery.json, create a document that contains its data, and push that document into the gallery list
         for (let artwork of parsedData) { 
+            // Makes sure that the first letter of each word in the artwork category and medium is capitalized
+            artwork.Category = artwork.Category.split(' ');
+            artwork.Category = artwork.Category.map(word => word.charAt(0).toUpperCase() + word.slice(1));
+            artwork.Category = artwork.Category.join(' ');
+
+            artwork.Medium = artwork.Medium.split(' ');
+            artwork.Medium = artwork.Medium.map(word => word.charAt(0).toUpperCase() + word.slice(1));
+            artwork.Medium = artwork.Medium.join(' ');
+
             let document = {
                 title: artwork.Title,
                 artist: artwork.Artist,

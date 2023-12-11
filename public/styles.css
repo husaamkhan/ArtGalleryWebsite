@@ -103,3 +103,8 @@ div.likes-container {
     padding: 1%;
     width: 30%;
 }
+
+div.search-container select,
+input {
+    margin: 0.4%;
+}

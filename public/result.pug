@@ -1,0 +1,18 @@
+html
+    head
+        title Result
+        link(rel='stylesheet', href='/style.css')
+
+    body(onload='loadResultPage()')
+        h2 Result
+        if result.length == 0
+            p No matching artpieces found!
+        
+        else
+            ul#result-list
+                each artpiece in result
+                    li
+                        a(href=`/gallery/view-art/${artpiece.title}`)=artpiece.title
+        
+            button#previous-button Previous
+            button#next-button Next

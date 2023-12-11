@@ -7,6 +7,8 @@ router.get('/add-artwork', renderAddArtwork);
 router.get('/get-artpieces', sendArtpieces);
 router.get('/validate-art/:title', validateArtpiece);
 router.get('/view-art/:title', renderArtpiecePage);
+router.get('/search', renderSearch);
+router.get('/search/:title/:category/:medium/:artist/:page', findArt);
 
 router.post('/post-artpiece', postArtpiece);
 router.post('/like/:title', like);
@@ -82,6 +84,65 @@ async function renderArtpiecePage(req, res, next) {
         console.log("Error rendering artpiece page: " + err);
         res.status(500).send('Internal server error');
     }
+}
+
+async function renderSearch(req, res, next) {
+    try {
+        console.log('Rendering search');
+        res.status(200).render('search');
+    }
+    catch (err) {
+        console.log("Error rendering search: " + err);
+        res.status(500).send("Internal server error");
+    }
+}
+
+async function findArt(req, res, next) {
+    try {
+        console.log("Searching for artpieces that match: " + req.params.title + " " + req.params.category + " " + req.params.medium + " " + req.params.artist);
+        
+        let filter = {};
+
+        if (req.params.title !== 'All') {
+            let title = fixLetterCasing(req.params.title);
+            filter.title = title;
+        }
+        if (req.params.category !== 'All') {
+            let category = fixLetterCasing(req.params.category);
+            filter.category = category;
+        }
+        if (req.params.medium !== 'All') {
+            let medium = fixLetterCasing(req.params.medium);
+            filter.medium = medium;
+        }
+        if (req.params.artist !== 'All') {
+            let artist = fixLetterCasing(req.params.artist);
+            filter.artist = artist;
+        }
+
+        console.log("Filter:")
+        console.log(filter);
+
+        // Find the artpieces from the gallery. Apply the filter to the search query
+        const result = await Gallery.find(filter).skip(req.params.page * 10).limit(10);
+        console.log(result);
+
+        // res.status(200).send(JSON.stringify(result)); 
+        res.status(200).render('result', { result });
+    }
+    catch (err) {
+        console.log("Error rendering artpiece page: " + err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+function fixLetterCasing(sentence) {
+    // Capitalize first letter of each word in the sentence
+    sentence = sentence.toLowerCase();
+    sentence = sentence.split(' ');
+    sentence = sentence.map(word => word.charAt(0).toUpperCase() + word.slice(1));
+    sentence = sentence.join(' ');
+    return sentence;
 }
 
 async function postArtpiece(req, res, next) {

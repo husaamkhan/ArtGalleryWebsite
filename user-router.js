@@ -9,6 +9,7 @@ router.post('/post-artpiece', postArtpiece)
 router.post('/like/:title', like);
 router.post('/unlike/:title', unlike);
 router.post('/post-review/:title', postReview);
+router.post('/follow/:username', followUser);
 
 router.get('/logOut', logOutUser);
 router.get('/dashboard', renderDashboard);
@@ -19,12 +20,15 @@ router.get('/workshops-hosted', renderWorkshopsHosted);
 router.get('/artwork', sendArtwork);
 router.get('/get-user-info', sendUserInfo);
 router.get('/add-review', renderAddReviewPage);
-router.get('/get-artist', renderProfile);
+router.get('/get-artist', findArtist);
+router.get('/profile/:username', renderProfile);
+router.get('/get-following', sendFollowing);
 
 router.put('/switchAccount', switchAccount);
 router.put('/update', updateAccount);
 
 router.delete('/delete-review/:title', deleteReview);
+router.delete('/unfollow/:username', unfollowUser);
 
 async function registerUser(req, res, next) {
     console.log('Registering user');
@@ -178,6 +182,41 @@ async function postReview(req, res, next) {
     }
 }
 
+async function followUser(req, res, next) {
+    try {
+        console.log("Searching for user with username: " + req.session.username);
+        const client = await User.findOne({ username: req.session.username });
+
+        if (client) {
+            console.log("User with username: " + client.username + " found");
+
+            console.log("Searching for user with username: " + req.params.username);
+            const artist = await User.findOne({ username: req.params.username });
+
+            if (artist) {
+                console.log("User with username: " + artist.username + ". Following user");
+
+                client.following.push(artist.username);
+                artist.followers.push(client.username);
+
+                client.save();
+                artist.save();
+
+                res.status(200).send("Added title to user's reviews successfully");
+            }
+
+        }
+        else {
+            console.log("User not found");
+            res.status(404).send("User not found");
+        }
+    }
+    catch (err) {
+        console.log("Error following user to user: " + err);
+        res.status(500).send("Internal server error");
+    }
+}
+
 function logOutUser(req, res, next) {
     if (req.session.loggedIn) { // If the user is already logged in, log them out and redirect the user to the log in page
         console.log('Logging out ' + req.session.username);
@@ -319,7 +358,7 @@ async function renderAddReviewPage(req, res, next) {
     }
 }
 
-async function renderProfile(req, res, next) {    
+async function findArtist(req, res, next) {    
     try {
         const name = req.query.artist.split(' ');
         const firstname = name[0];
@@ -336,12 +375,8 @@ async function renderProfile(req, res, next) {
         const user = await User.findOne( { firstname: firstname, lastname: lastname, artwork: artpiece });
 
         if (user) {
-            console.log('Found user ' + user.username + '. Rendering profile');
-            res.status(200).render('profile', {
-                name: `${user.firstname} ${user.lastname}`,
-                artwork: user.artwork,
-                workshops: user.workshopsHosted
-            });
+            console.log('Found user ' + user.username + '. Redirecting');
+            res.status(200).redirect(`/user/profile/${user.username}`);
             return;
         }
         else {
@@ -351,7 +386,60 @@ async function renderProfile(req, res, next) {
         }
     }
     catch (err) {
-        console.log('Error rendering profile: ' + err);
+        console.log('Error finding user: ' + err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function renderProfile(req, res, next) {
+    try {
+        console.log("Searching for user with username: " + req.params.username);
+
+        const user = await User.findOne({ username: req.params.username });
+
+        if (user) {
+            console.log("Found user with username: " + user.username + ". Rendering profile");
+
+            res.status(200).render('profile', {
+                thisuser: req.session.username, // Used to check if the profile being viewed is this user, to prevent the user from following themself
+                username: user.username,
+                name: `${user.firstname} ${user.lastname}`,
+                following: user.following,
+                followers: user.followers,
+                artwork: user.artwork,
+                workshops: user.workshopsHosted
+            })
+        }
+        else {
+            console.log("User with username: " + req.params.username + ' not found');
+            res.status(404).send("User not found");
+        }
+
+    }
+    catch (err) {
+        console.log("Error rendering profile: " + err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function sendFollowing(req, res, next) {
+    try {
+        console.log("Searching for user with username: " + req.session.username);
+        const user = await User.findOne({ username: req.session.username });
+
+        if (user) {
+            console.log("Found user with username: " + req.session.username +". Sending following list");
+
+            res.status(200).send(JSON.stringify(user.following));
+        }
+        else {
+            console.log("User with username: " + req.session.username + ' not found');
+            res.status(404).redirect('/');
+        }
+
+    }
+    catch (err) {
+        console.log("Error sending following list: " + err);
         res.status(500).send('Internal server error');
     }
 }
@@ -512,6 +600,44 @@ async function deleteReview(req, res, next) {
     catch (err) {
         console.log('Error deleting review from user: ' + err);
         res.status(500).send('Internal server error');
+    }
+}
+
+async function unfollowUser(req, res, next) {
+    console.log('unfollowing user');
+    try {
+        console.log("Searching for user with username: " + req.session.username);
+        const client = await User.findOne({ username: req.session.username });
+
+        if (client) {
+            console.log("User with username: " + client.username + " found");
+
+            console.log("Searching for user with username: " + req.params.username);
+            const artist = await User.findOne({ username: req.params.username });
+
+            if (artist) {
+                console.log("Found User with username: " + artist.username)
+
+                client.following = client.following.filter(profile => profile != artist.username);
+                artist.followers = artist.followers.filter(profile => profile != client.username);
+
+                console.log(client.following);
+
+                client.save();
+                artist.save();
+
+                res.status(200).send("Added title to user's reviews successfully");
+            }
+
+        }
+        else {
+            console.log("User not found");
+            res.status(404).send("User not found");
+        }
+    }
+    catch (err) {
+        console.log("Error unfollowing user to user: " + err);
+        res.status(500).send("Internal server error");
     }
 }
 

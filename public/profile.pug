@@ -4,9 +4,15 @@ html
         link(rel='stylesheet', href='/styles.css')
         script(src='/js/client.js')
     
-    body
+    body(onload=`loadProfilePage('${username}')`)
         include header.pug
         h2=name
+
+        if thisuser !== username
+            button#follow-button
+
+        p= `Following: ${following.length}`
+        p= `Followers: ${followers.length}`
 
         p=`${name}'s Art:`
         if artwork.length > 0
@@ -24,4 +30,4 @@ html
                     li
                         a(href=`/workshop/view-workshop/${workshop}`)=workshop
         else
-            p=`${name} isn't hosting any workshops yet`
+            li=`${name} isn't hosting any workshops yet`

@@ -342,3 +342,133 @@ function removeReview() {
     xhttpUser.open('DELETE', `/user/delete-review/${title}`);
     xhttpUser.send();
 }
+
+function loadProfilePage(username) {
+    let followButton = document.getElementById('follow-button');
+
+    if (followButton) { // Follow button is only on the page if the user is not viewing their own profile
+        const xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                const following = JSON.parse(this.responseText);
+
+                if (following.includes(username)) { // Checks if the user is following this artist and set the buttons text and response accordingly
+                    followButton.textContent = 'Unfollow';
+                    followButton.addEventListener('click', function() { unfollowUser(username) });
+                }
+                else {
+                    followButton.textContent = 'Follow';
+                    followButton.addEventListener('click', function() { followUser(username) });
+                }
+            }
+        }
+        xhttp.open('GET', '/user/get-following');
+        xhttp.send();
+    }
+}
+
+function followUser(username) {
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            alert('Successfully following user!');
+            location.reload();
+        }
+        else if (this.readyState == 4 && this.status == 404) {
+            alert('User not found');
+        }
+    }
+    xhttp.open('POST', `/user/follow/${username}`);
+    xhttp.send();
+}
+
+function unfollowUser(username) {
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            alert('Successfully unfollowed user!');
+            location.reload();
+        }
+        else if (this.readyState == 4 && this.status == 404) {
+            alert('User not found');
+        }
+    }
+    xhttp.open('DELETE', `/user/unfollow/${username}`);
+    xhttp.send();
+}
+
+function loadSearchPage() {
+    document.getElementById('search-button').addEventListener('click', function() { search() });
+}
+
+function search() {
+    let search = document.getElementById('search-input').value;
+    let category = document.getElementById('category-select').value;
+    let medium = document.getElementById('medium-input').value;
+    let artist = document.getElementById('artist-input').value
+
+    // If anything was left empty, set a default value so that the client is not requesting a url with an empty parameter (e.g /gallery/search//category/medium/artist)
+    if (search === '') { search = 'All' };
+    if (medium === '') { medium = 'All' };
+    if (artist === '') { artist = 'All' };
+
+    location.href = `/gallery/search/${search}/${category}/${medium}/${artist}?page=0`;
+
+    // const xhttp = new XMLHttpRequest();
+    // xhttp.onreadystatechange = function() {
+    //     if (this.readyState == 4 && this.status == 200) {
+    //         // document.getElementById('result-container').innerHTML = this.responseText;
+    //         let result = JSON.parse(this.responseText).result;
+    //         let resultContainer = document.getElementById('result-container');
+
+    //         if (result.length == 0) {
+    //             let p = document.createElement('p');
+    //             p.textContent = 'No matching artpieces';
+    //             resultContainer.appendChild(p);
+    //         }
+    //         else {
+    //             let ul = document.createElement('ul');
+    //             for (let artpiece of result) {
+    //                 let li = document.createElement('li');
+
+    //                 let a = document.createElement('a');
+    //                 a.href = `/gallery/view-art/${artpiece.title}`;
+    //                 a.textContent = artpiece.title;
+
+    //                 li.appendChild(a);
+    //                 ul.appendChild(li);
+    //             }
+    //             resultContainer.appendChild(ul);
+
+    //             let previousButton = document.createElement('button');
+    //             previousButton.textContent = 'Previous';
+    //             previousButton.addEventListener('click', function() { getPreviousResult() });
+
+    //             let nextButton = document.createElement('button');
+    //             nextButton.textContent = 'Next';
+    //             nextButton.addEventListener('click', function() { getNextResult() });
+    //         }
+    //     }
+    // }
+    // xhttp.open('GET', `/gallery/search/${search}/${category}/${medium}/${artist}?page=${page}`);
+    // xhttp.send(JSON.stringify);
+}
+
+function loadResultPage() {
+    let previousButton = document.getElementById('previous-button');
+    let nextButton = document.getElementById('next-button');
+
+    // If there is a result that was loaded, the buttons will not be undefined. If the previous button exists, the next one does too
+    if (previousButton) {
+        previousButton.addEventListener('click', function() { getPreviousResult() });
+        nextButton.addEventListener('click', function() { getNextResult() });
+    }
+}
+
+function getPreviousResult() {
+    
+}
+
+function getNextResult() {
+
+}

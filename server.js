@@ -57,7 +57,7 @@ mongoose.connect('mongodb://127.0.0.1/galleryDatabase');
 
 let db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
+db.once('open', function() {8
     console.log('Connected to galleryDatabase database');
     app.listen(3000);
     console.log('Server listening on port 3000');
