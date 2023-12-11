@@ -3,7 +3,7 @@ const app = express();
 
 app.set('views', 'public');
 app.use(express.static('public'));
-app.set('view engine', 'pug');8
+app.set('view engine', 'pug');
 app.use(express.json());
 
 const mongoose = require('mongoose');

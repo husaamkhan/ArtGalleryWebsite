@@ -8,3 +8,8 @@ html
         h2 Artists you follow
         if following.length == 0 
             p You aren't following any artists yet!
+        else
+            ul
+                each artist in following
+                    li
+                        a(href=`/user/profile/${artist}`)=artist

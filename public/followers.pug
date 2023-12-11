@@ -1,0 +1,14 @@
+html
+    head
+        title Followers
+        link(rel='stylesheet', href='/styles.css')
+
+    body
+        h2 Followers
+        ul
+            if followers.length == 0
+                li No followers yet!
+            
+            else
+                each follower in followers
+                    li=follower

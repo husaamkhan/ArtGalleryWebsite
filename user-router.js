@@ -20,9 +20,12 @@ router.get('/workshops-hosted', renderWorkshopsHosted);
 router.get('/artwork', sendArtwork);
 router.get('/get-user-info', sendUserInfo);
 router.get('/add-review', renderAddReviewPage);
-router.get('/get-artist', findArtist);
+router.get('/get-artist', getArtist);
 router.get('/profile/:username', renderProfile);
 router.get('/get-following', sendFollowing);
+router.get('/search-artist', renderSearch);
+router.get('/search/:name/:page', findArtist);
+router.get('/followers', renderFollowers)
 
 router.put('/switchAccount', switchAccount);
 router.put('/update', updateAccount);
@@ -97,7 +100,9 @@ async function postArtpiece(req, res, next) {
             
             await user.save();
             // Send the modified artwork back to the client so that it can be sent to the gallery collection as well
-            res.status(200).send(JSON.stringify(artwork));  
+            res.status(200).send(JSON.stringify(artwork));
+            
+            notifyFollowers(user, `${user.username} posted a new artpiece`)
         }
         else {
             console.log("User not found");
@@ -107,6 +112,27 @@ async function postArtpiece(req, res, next) {
     catch(err) {
         console.log("Error posting artpiece to user: " + err);
         res.status(500).send("Intenal server error");
+    }
+}
+
+async function notifyFollowers(artist, message) {
+    try {
+        console.log("Notifying followers");
+        for (let follower of artist.followers) {
+            const user = await User.findOne({ username: follower });
+
+            if (user) {
+                console.log('Notifying user: ' + user.username);
+                user.notifications.push(message);
+                await user.save();
+            }
+            else {
+                console.log('User:  + ' + user.username + ' not found');
+            }
+        }
+    }
+    catch (err) {
+        console.log("Error notifying followers: " + err);
     }
 }
 
@@ -358,7 +384,7 @@ async function renderAddReviewPage(req, res, next) {
     }
 }
 
-async function findArtist(req, res, next) {    
+async function getArtist(req, res, next) {    
     try {
         const name = req.query.artist.split(' ');
         const firstname = name[0];
@@ -434,12 +460,92 @@ async function sendFollowing(req, res, next) {
         }
         else {
             console.log("User with username: " + req.session.username + ' not found');
-            res.status(404).redirect('/');
+            res.status(404).send("User not found");
         }
 
     }
     catch (err) {
         console.log("Error sending following list: " + err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function renderSearch(req, res, next) {
+    try {
+        console.log('Rendering search');
+        res.status(200).render('search-artist');
+    }
+    catch (err) {
+        console.log("Error rendering search: " + err);
+        res.status(500).send("Internal server error");
+    }
+}
+
+async function findArtist(req, res, next) {
+    try {
+        console.log("Searching for artists that match: " + req.params.name + " " + req.params.page);
+        
+        let filter = {};
+
+        if (req.params.name !== 'All') {
+            let name = fixLetterCasing(req.params.name);
+            name = name.split(' ');
+            let firstname = name.shift();
+            let lastname = name.join(' ');
+
+            if (!lastname) {
+                lastname = '';
+            }
+
+            filter.firstname = firstname;
+            filter.lastname = lastname;
+        }
+
+        filter.artist = true;
+        console.log(filter);
+
+        // Find the users from the user collection. Apply the filter and limit to the search query
+        const result = await User.find(filter).skip(req.params.page * 10).limit(10);
+
+        console.log(result);
+
+        if (result.length > 0) { 
+            console.log("Result found. sending result");
+            res.status(200).send(JSON.stringify(result));
+        }
+        else {
+            console.log('Result not found');
+            res.status(404).send(JSON.stringify(result));
+        }
+    }
+    catch (err) {
+        console.log("Error finding artists: " + err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+function fixLetterCasing(sentence) {
+    // Capitalize first letter of each word in the sentence
+    sentence = sentence.toLowerCase();
+    sentence = sentence.split(' ');
+    sentence = sentence.map(word => word.charAt(0).toUpperCase() + word.slice(1));
+    sentence = sentence.join(' ');
+    return sentence;
+}
+
+async function renderFollowers(req, res, next) {
+    try {
+        console.log('Searching for user with username: ' + req.session.username);
+        const user = await User.findOne({ username: req.session.username });
+
+        if (user) {
+            console.log('Found user: ' + user.username + '. Rendering followers');
+
+            res.status(200).render('followers', { followers: user.followers });
+        }
+    }
+    catch (err) {
+        console.log("Error rendering follower: " + err);
         res.status(500).send('Internal server error');
     }
 }

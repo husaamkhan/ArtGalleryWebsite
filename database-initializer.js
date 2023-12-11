@@ -83,6 +83,13 @@ db.once('open', async function () {
                 lastname = lastname.toLowerCase();
                 lastname = lastname.charAt(0).toUpperCase() + lastname.slice(1);
 
+                if (lastname.split(' ').length > 1) {
+                    lastname = lastname.split(' ');
+                    lastname[1] = lastname[1].toLowerCase();
+                    lastname[1] = lastname[1].charAt(0).toUpperCase() + lastname[1].slice(1);
+                    lastname = lastname.join(' ');
+                }
+
                 let userInfo = {
                     username: username,
                     password: password,

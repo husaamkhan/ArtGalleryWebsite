@@ -17,6 +17,8 @@ html
 
                 if artist
                     li
+                        a(href='/user/followers') View your followers
+                    li
                         a(href='/user/workshops-hosted') View workshops you have hosted
                     li
                         a(href='/workshops/create-workshop') Create a workshop
@@ -36,8 +38,12 @@ html
         div(class='dashboard-bottom')
             div(class='notifications-container')
                 h4 Your notifications
+                ul
                 if notifications.length == 0
                         li No notifications yet!
+                else
+                    each notification in notifications
+                        li=notification
 
             div(class='likes-container')
                 h4 Your likes

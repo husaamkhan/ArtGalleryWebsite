@@ -7,8 +7,9 @@ router.get('/add-artwork', renderAddArtwork);
 router.get('/get-artpieces', sendArtpieces);
 router.get('/validate-art/:title', validateArtpiece);
 router.get('/view-art/:title', renderArtpiecePage);
-router.get('/search', renderSearch);
+router.get('/search-art', renderSearch);
 router.get('/search/:title/:category/:medium/:artist/:page', findArt);
+router.get('/artwork', renderArtwork);
 
 router.post('/post-artpiece', postArtpiece);
 router.post('/like/:title', like);
@@ -89,7 +90,7 @@ async function renderArtpiecePage(req, res, next) {
 async function renderSearch(req, res, next) {
     try {
         console.log('Rendering search');
-        res.status(200).render('search');
+        res.status(200).render('search-art');
     }
     catch (err) {
         console.log("Error rendering search: " + err);
@@ -99,7 +100,7 @@ async function renderSearch(req, res, next) {
 
 async function findArt(req, res, next) {
     try {
-        console.log("Searching for artpieces that match: " + req.params.title + " " + req.params.category + " " + req.params.medium + " " + req.params.artist);
+        console.log("Searching for artpieces that match: " + req.params.title + " " + req.params.category + " " + req.params.medium + " " + req.params.artist + " " + req.params.page);
         
         let filter = {};
 
@@ -120,19 +121,42 @@ async function findArt(req, res, next) {
             filter.artist = artist;
         }
 
-        console.log("Filter:")
-        console.log(filter);
-
         // Find the artpieces from the gallery. Apply the filter to the search query
         const result = await Gallery.find(filter).skip(req.params.page * 10).limit(10);
-        console.log(result);
 
-        // res.status(200).send(JSON.stringify(result)); 
-        res.status(200).render('result', { result });
+        if (result.length > 0) { 
+            console.log("Result found. sending result");
+            res.status(200).send(JSON.stringify(result));
+        }
+        else {
+            console.log('Result not found');
+            res.status(404).send(JSON.stringify(result));
+        }
+    }
+    catch (err) {
+        console.log("Error finding art: " + err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function renderArtwork(req, res, next) {
+    try {
+        console.log('Searching for all artpieces');
+
+        const artwork = await Gallery.find();
+
+        if (artwork) {
+            console.log("Artwork found. Rendering artwork page");
+            res.status(200).render('artwork', { artwork });
+        }
+        else {
+            console.log("Artwork not found!");
+            res.status(404).send("Artwork not found!");
+        }
     }
     catch (err) {
         console.log("Error rendering artpiece page: " + err);
-        res.status(500).send('Internal server error');
+        res.status(500).send("Internal server error");
     }
 }
 
