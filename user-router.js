@@ -471,8 +471,11 @@ async function renderAddReviewPage(req, res, next) {
 async function getArtist(req, res, next) {    
     try {
         const name = req.query.artist.split(' ');
-        const firstname = name[0];
-        let lastname = name[1];
+        console.log(name);
+        // const firstname = name[0];
+        // let lastname = name[1];
+        const firstname = name.shift();
+        let lastname = name.join(' ');
 
         if (lastname === undefined) { // If the user has no last name (e.g Banksy, Luke), then make their last name ''
             lastname = '';
