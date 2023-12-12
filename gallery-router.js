@@ -110,7 +110,7 @@ async function findArt(req, res, next) {
             filter.title = title;
         }
         if (req.params.category !== 'All') {
-            let category = fixLetterCasing(req.params.category);
+            let category = req.params.category;
             filter.category = category;
         }
         if (req.params.medium !== 'All') {
