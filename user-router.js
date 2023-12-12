@@ -10,6 +10,8 @@ router.post('/like/:title', like);
 router.post('/unlike/:title', unlike);
 router.post('/post-review/:title', postReview);
 router.post('/follow/:username', followUser);
+router.post('/create-workshop', createWorkshop);
+router.post('/join-workshop', joinWorkshop);
 
 router.get('/logOut', logOutUser);
 router.get('/dashboard', renderDashboard);
@@ -26,6 +28,7 @@ router.get('/get-following', sendFollowing);
 router.get('/search-artist', renderSearch);
 router.get('/search/:name/:page', findArtist);
 router.get('/followers', renderFollowers)
+router.get('/create-workshop', renderCreateWorkshop);
 
 router.put('/switchAccount', switchAccount);
 router.put('/update', updateAccount);
@@ -117,7 +120,7 @@ async function postArtpiece(req, res, next) {
     }
 }
 
-async function notifyFollowers(artist, message) {
+async function notifyFollowers(artist, message) { // Send the provided message to all the followers of the provided artist
     try {
         console.log("Notifying followers");
         for (let follower of artist.followers) {
@@ -129,7 +132,7 @@ async function notifyFollowers(artist, message) {
                 await user.save();
             }
             else {
-                console.log('User:  + ' + user.username + ' not found');
+                console.log('User: ' + user.username + ' not found');
             }
         }
     }
@@ -196,7 +199,6 @@ async function postReview(req, res, next) {
         const user = await User.findOne({ username: req.session.username });
 
         if (user) {
-            console.log(req.params.title);
             console.log("User with username" + req.session.username + " found. Adding title " + req.params.title + " to reviews");
             user.reviews.push(req.params.title);
             await user.save();
@@ -230,8 +232,8 @@ async function followUser(req, res, next) {
             if (artist) {
                 console.log("User with username: " + artist.username + ". Following user");
 
-                client.following.push(artist.username);
-                artist.followers.push(client.username);
+                client.following.push(artist.username); // Add the artist to the client's following list
+                artist.followers.push(client.username); // Add the client to the artist's followers list
 
                 client.save();
                 artist.save();
@@ -250,6 +252,68 @@ async function followUser(req, res, next) {
     catch (err) {
         console.log("Error following user to user: " + err);
         res.status(500).send("Internal server error");
+    }
+}
+
+async function createWorkshop(req, res, next) {
+    console.log('Finding user with username: ' + req.session.username);
+
+    try {
+        const user = await User.findOne( { username: req.session.username } );
+
+        if (user) {
+            console.log('Found user ' + user.username + '. Creating workshop');
+            user.workshopsHosted.push(req.body.name);
+            await user.save();
+
+            res.status(200).send("Workshop successfully created");
+
+            notifyFollowers(user, `${user.username} created a new workshop`);
+        }
+        else {
+            console.log('User not found');
+            req.session.loggedIn = false;
+            req.session.username = undefined;
+            res.status(404).send('User not found');
+            return;
+        }
+    }
+    catch (err) {
+        console.log('Error creating workshop: ' + err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function joinWorkshop(req, res, next) {
+    console.log('Finding user with username: ' + req.session.username);
+
+    try {
+        const user = await User.findOne( { username: req.session.username } );
+
+        if (user) {
+            if (user.workshopsJoined.includes(req.body.workshop)) { // Check if the user is already in the workshop
+                console.log("User already in workshop!");
+                res.status(400).send('Already in workshop');
+            }
+            else {
+                console.log('Found user ' + user.username + '. Joining workshop');
+                user.workshopsJoined.push(req.body.workshop);
+                await user.save();
+
+                res.status(200).send("Workshop successfully joined");
+            }
+        }
+        else {
+            console.log('User not found');
+            req.session.loggedIn = false;
+            req.session.username = undefined;
+            res.status(404).send('User not found');
+            return;
+        }
+    }
+    catch (err) {
+        console.log('Error joining workshop: ' + err);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -323,7 +387,7 @@ async function renderAccount(req, res, next) {
     }
 }
 
-async function sendArtwork(req, res, next) {
+async function sendArtwork(req, res, next) { // Send a list of the user's artwork
     console.log('Finding user with username: ' + req.session.username);
 
     try {
@@ -453,7 +517,9 @@ async function renderProfile(req, res, next) {
                 following: user.following,
                 followers: user.followers,
                 artwork: user.artwork,
-                workshops: user.workshopsHosted
+                workshops: user.workshopsHosted,
+                reviews: user.reviews,
+                likes: user.likes
             })
         }
         else {
@@ -566,6 +632,23 @@ async function renderFollowers(req, res, next) {
     }
     catch (err) {
         console.log("Error rendering follower: " + err);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function renderCreateWorkshop(req, res, next) {
+    try {
+        console.log("Searching for user with username: " + req.session.username);
+        const user = await User.findOne({ username: req.session.username });
+
+        if (user) {
+            console.log('Found user: ' + user.username + '. Creating workshop');
+
+            res.status(200).render('create-workshop');
+        }
+    }
+    catch (err) {
+        console.log("Error rendering create workshop: " + err);
         res.status(500).send('Internal server error');
     }
 }

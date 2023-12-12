@@ -46,7 +46,7 @@ async function sendArtpieces(req, res, next) {
     }
 }
 
-async function validateArtpiece(req, res, next) {
+async function validateArtpiece(req, res, next) { // Checks if an artpiece with the chosen name is already in the database
     try {
         console.log('Searching for artpiece with title: ' + req.params.title);
         const result = await Gallery.findOne({ title: req.params.title });
@@ -104,6 +104,7 @@ async function findArt(req, res, next) {
         
         let filter = {};
 
+        // For any filter that was entered, capitalize the first letter of each word in the filter and add to the filter
         if (req.params.title !== 'All') {
             let title = fixLetterCasing(req.params.title);
             filter.title = title;
@@ -271,6 +272,7 @@ async function deleteReview(req, res, next) {
         if (artpiece) {
             console.log("Artpiece with title " + artpiece.title + " found, deleting review");
 
+            // Filter the reviews down to all the reviews that are not by that of the user with the provided username
             artpiece.reviews = artpiece.reviews.filter(review => review.username != req.session.username);
             await artpiece.save();
 

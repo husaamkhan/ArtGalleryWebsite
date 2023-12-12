@@ -8,3 +8,6 @@ html
         h2 Workshops You've Joined
         if workshopsJoined.length == 0 
             p You haven't joined any workshops yet!
+        else
+            each workshop in workshopsJoined
+                li=workshop

@@ -1,6 +1,6 @@
 html
     head
-        title artist.name
+        title=`${username}'s Profile`
         link(rel='stylesheet', href='/styles.css')
         script(src='/js/client.js')
     
@@ -14,7 +14,7 @@ html
         p= `Following: ${following.length}`
         p= `Followers: ${followers.length}`
 
-        p=`${name}'s Art:`
+        p=`${name}'s Artwork:`
         if artwork.length > 0
             ul
                 each artpiece in artwork
@@ -22,12 +22,30 @@ html
                         a(href=`/gallery/view-art/${artpiece}`)=artpiece
         else
             p=`${name} hasn't posted any art yet`
-        
+        br
         p=`${name}'s Workshops:`
         if workshops.length > 0
             ul
                 each workshop in workshops
                     li
-                        a(href=`/workshop/view-workshop/${workshop}`)=workshop
+                        a(href='', onclick=`joinWorkshop("${workshop}")`)=workshop
         else
             li=`${name} isn't hosting any workshops yet`
+        br
+        p=`${name}'s Reviews:`
+        if reviews.length > 0
+            ul
+                each review in reviews
+                    li
+                        a(href=`/gallery/view-art/${review}`)=review
+        else
+            li=`${name} hasn't posted any reviews yet`
+        br
+        p=`${name}'s Likes:`
+        if likes.length > 0
+            ul
+                each like in likes
+                    li
+                        a(href=`/gallery/view-art/${like}`)=like
+        else
+            li=`${name} hasn't liked anything yet`

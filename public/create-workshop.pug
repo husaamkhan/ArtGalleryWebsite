@@ -1,0 +1,12 @@
+html
+    head
+        title Create Workshop
+        link(rel='stylesheet', href='/styles.css')
+        script(src='/js/client.js')
+    
+    body(onload='loadCreateWorkshopPage()')
+        include header.pug
+        h2 Create a Workshop
+        p Enter a name for your workshop:
+        input#name-input(type='text')
+        button#submit-button Create Workshop

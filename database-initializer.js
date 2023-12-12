@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const Gallery = require('./ArtModel');
 const User = require('./UserModel');
-const Workshop = require('./WorkshopModel');
 
 mongoose.connect('mongodb://127.0.0.1/galleryDatabase');
 let db = mongoose.connection;
@@ -117,14 +116,6 @@ db.once('open', async function () {
     }
     catch(err) {
         console.log('Error initializing Users: ' + err);
-    }
-
-    try {
-        const result = await Workshop.create([]); // Create an empty Workshop collection
-        console.log('Successfully created Workshop');
-    }
-    catch(err) {
-        console.log('Error creating Workshop: ' + err);
     }
 
     await mongoose.disconnect();

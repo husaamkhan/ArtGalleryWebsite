@@ -21,20 +21,10 @@ html
                     li
                         a(href='/user/workshops-hosted') View workshops you have hosted
                     li
-                        a(href='/workshops/create-workshop') Create a workshop
+                        a(href='/user/create-workshop') Create a workshop
                     li
                         a(href='/gallery/add-artwork') Post an artpiece
-        
-        //- if artist
-        //-     h4 Your artwork
-        //-     if artwork.length == 0
-        //-         p No posts yet!
-        //-     else
-        //-         ul#artwork-list
-        //-             each artpiece in artwork
-        //-                 li
-        //-                     a(href=`/gallery/view-art/${artpiece}`)=artpiece
-                            
+                               
         div(class='dashboard-row')
             div(class='left-container')
                 h4 Your artwork

@@ -25,6 +25,7 @@ app.use(session({
 
 app.use(function (req, res, next) { 
     console.log(req.session); 
+    console.log("Request: " + req.path);
     next(); 
 });
 
@@ -37,7 +38,7 @@ app.get('/', sendLogInPage);
 app.get('/register', sendRegistrationPage);
 
 app.use((req, res, next) => {
-    res.status(404).render('page-not-found');
+    res.status(404).render('page-not-found'); // Sends the page not found page if the request does not match any routes
 });
 
 async function sendLogInPage(req, res, next) {

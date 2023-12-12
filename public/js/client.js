@@ -52,14 +52,14 @@ function requestLogIn() {
 
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 404) {
+        if (this.readyState == 4 && this.status == 404) { // Tell user they entered invalid credentials
             alert('Invalid credentials! Please try again.');
             document.getElementById('username-input').style.border = '1px solid red';
             document.getElementById('password-input').style.border = '1px solid red';
         }
 
         if (this.readyState == 4 && this.status == 200) {
-            location.href = '/user/dashboard';
+            location.href = '/user/dashboard'; // Redirect to dashboard
         }
     }
     xhttp.open('POST', '/user/logIn');
@@ -182,7 +182,7 @@ function addArtWork() {
             xhttp1.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     alert('Art added successfully');
-                    location.href = '/user/dashboard';
+                    location.href = '/user/dashboard'; // Redirect to dashboard
                 }
             }
             xhttp1.open('POST', '/gallery/post-artpiece');
@@ -191,7 +191,7 @@ function addArtWork() {
         }
         else if (this.readyState == 4 && this.status == 404) {
             alert("User not found! Redirecting to log in page!");
-            location.href = '/';
+            location.href = '/'; // If the user couldn't be found, relocate them to the log in page
         }
     }
     xhttp.open('POST', '/user/post-artpiece');
@@ -243,6 +243,7 @@ function loadArtpiecePage() {
 }
 
 function review(userInfo) {
+    // If the user already left a review, remove it
     if (userInfo.reviews.includes(document.getElementById('title-header').textContent)) {
         removeReview();
     }
@@ -462,9 +463,9 @@ function renderArtResult(result, search, category, medium, artist, page) {
 }
 
 function getPreviousArtResult(search, category, medium, artist, page) {
-    page--;
+    page--; // Decrement page to get results from previous page
 
-    if (page >= 0) {
+    if (page >= 0) { // Only send the request for the first page onward
         let xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
@@ -477,7 +478,7 @@ function getPreviousArtResult(search, category, medium, artist, page) {
 }
 
 function getNextArtResult(search, category, medium, artist, page) {
-    page++;
+    page++; // Increment page to get the result for the next page
 
     let xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
@@ -493,7 +494,8 @@ function loadArtworkPage() {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-            renderArtResult(JSON.parse(this.responseText), 'All', 'All', 'All', 'All', 0);
+            // Reuses the render art result method, but passes 'All' in for the filters
+            renderArtResult(JSON.parse(this.responseText), 'All', 'All', 'All', 'All', 0); 
         }
     }
     xhttp.open('GET', '/gallery/search/All/All/All/All/0');
@@ -515,7 +517,7 @@ function searchArtist() {
             renderArtistResult(JSON.parse(this.responseText), search, 0)
         }
         else if (this.readyState == 4 && this.status == 404) {
-            document.getElementById('result-container').innerHTML = '';
+            document.getElementById('result-container').innerHTML = ''; // Reset container incase previous search results are inside
             let p = document.createElement('p');
             p.textContent = 'No matching artists';
             document.getElementById('result-container').appendChild(p);
@@ -580,4 +582,52 @@ function getNextArtistResult(search, page) {
         }
         xhttp.open('GET', `/user/search/${search}/${page}`);
         xhttp.send();
+}
+
+function loadCreateWorkshopPage() {
+    document.getElementById('submit-button').addEventListener('click', function() { createWorkshop() });
+}
+
+function createWorkshop() {
+    let name = document.getElementById('name-input').value;
+
+    if (name === '') {
+        alert('Please enter a name for the workshop!');
+        document.getElementById('name-input').style.border = '1px solid red'
+    }
+    else {
+        const xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                alert('Workshop successfully created!');
+                location.href = '/user/workshops-hosted'
+            }
+            else if (this.readyState == 4 && this.status == 404) {
+                alert(this.responseText);
+            }
+        }
+        xhttp.open('POST', `/user/create-workshop`);
+        xhttp.setRequestHeader('Content-Type', 'application/json');
+        xhttp.send(JSON.stringify({ name: name }));
+    }
+}
+
+function joinWorkshop(ws) {
+    alert(ws);
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            alert('Successfully joined workshop');
+        }
+        else if (this.readyState == 4 && this.status == 404) {
+            alert('User not found. Redirecting to log in');
+            location.href = '/';
+        }
+        else if (this.readyState == 4 && this.status == 400) {
+            alert('You have already joined this workshop');
+        }
+    }
+    xhttp.open('POST', `/user/join-workshop`);
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.send(JSON.stringify({ workshop: ws }));
 }

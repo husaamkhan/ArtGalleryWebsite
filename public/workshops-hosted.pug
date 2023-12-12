@@ -6,5 +6,9 @@ html
     body
         include header.pug
         h2 Workshops You're Hosting
+        ul
         if workshopsHosted.length == 0 
-            p You aren't hosting any workshops!
+            li You aren't hosting any workshops yet
+        else
+            each workshop in workshopsHosted
+                li=workshop
