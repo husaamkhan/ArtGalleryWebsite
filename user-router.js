@@ -106,6 +106,8 @@ async function postArtpiece(req, res, next) {
         }
         else {
             console.log("User not found");
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).send("User not found!");
         }
     }
@@ -151,6 +153,8 @@ async function like(req, res, next) {
         }
         else {
             console.log("User not found");
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).send("User not found");
         }
     }
@@ -175,6 +179,8 @@ async function unlike(req, res, next) {
         }
         else {
             console.log("User not found");
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).send("User not found");
         }
     }
@@ -199,6 +205,8 @@ async function postReview(req, res, next) {
         }
         else {
             console.log("User not found");
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).send("User not found");
         }
     }
@@ -234,6 +242,8 @@ async function followUser(req, res, next) {
         }
         else {
             console.log("User not found");
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).send("User not found");
         }
     }
@@ -275,6 +285,8 @@ async function renderDashboard(req, res, next) {
         }
         else {
             console.log('User not found');
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).redirect('/'); // If no user is found, redirect to log in page
             return;
         }
@@ -299,6 +311,8 @@ async function renderAccount(req, res, next) {
         }
         else {
             console.log('User not found');
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).redirect('/'); // If no user found, redirect to log in page
             return;
         }
@@ -323,6 +337,8 @@ async function sendArtwork(req, res, next) {
         }
         else {
             console.log('User not found');
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).redirect('/'); // If user is not found, redirect them to the log in page
             return;
         }
@@ -352,6 +368,8 @@ async function sendUserInfo(req, res, next) {
         }
         else {
             console.log("User not found!");
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).send("User not found!");
         }
 
@@ -374,6 +392,8 @@ async function renderAddReviewPage(req, res, next) {
         }
         else {
             console.log('User not found');
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).redirect('/'); // If no user is found, redirect to log in page
             return;
         }
@@ -407,7 +427,7 @@ async function getArtist(req, res, next) {
         }
         else {
             console.log('User not found');
-            res.status(404).redirect('/'); // If no user is found, redirect to log in page
+            res.status(404).send("Artist not found");
             return;
         }
     }
@@ -460,6 +480,8 @@ async function sendFollowing(req, res, next) {
         }
         else {
             console.log("User with username: " + req.session.username + ' not found');
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).send("User not found");
         }
 
@@ -506,8 +528,6 @@ async function findArtist(req, res, next) {
 
         // Find the users from the user collection. Apply the filter and limit to the search query
         const result = await User.find(filter).skip(req.params.page * 10).limit(10);
-
-        console.log(result);
 
         if (result.length > 0) { 
             console.log("Result found. sending result");
@@ -575,6 +595,8 @@ async function switchAccount(req, res, next) {
         }
         else {
             console.log('User not found');
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).send('User not found');
             return;
         }
@@ -600,6 +622,8 @@ async function updateAccount(req, res, next) {
         }
         else {
             console.log('User not found');
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).send('User not found'); // Send 404 if user not found, client will redirect user to log in page
             return;
         }
@@ -624,6 +648,8 @@ async function renderFollowing(req, res, next) {
         }
         else {
             console.log('User not found');
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).redirect('/');
             return;
         }
@@ -648,6 +674,8 @@ async function renderWorkshopsJoined(req, res, next) {
         }
         else {
             console.log('User not found');
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).redirect('/');
             return;
         }
@@ -672,6 +700,8 @@ async function renderWorkshopsHosted(req, res, next) {
         }
         else {
             console.log('User not found');
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).redirect('/');
             return;
         }
@@ -699,6 +729,8 @@ async function deleteReview(req, res, next) {
         else {
 
             console.log('User not found');
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).redirect('/');
             return;
         }
@@ -738,6 +770,8 @@ async function unfollowUser(req, res, next) {
         }
         else {
             console.log("User not found");
+            req.session.loggedIn = false;
+            req.session.username = undefined;
             res.status(404).send("User not found");
         }
     }

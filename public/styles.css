@@ -87,19 +87,19 @@ div.artpiece-container {
     display: block;
 }
 
-div.dashboard-bottom {
+div.dashboard-row {
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
 }
 
-div.notifications-container {
+div.left-container {
     flex: 1;
     margin-right: 1%;   
     padding: 1%; 
 }
 
-div.likes-container {
+div.right-container {
     flex: 1;
     justify-content: left;
     padding: 1%;

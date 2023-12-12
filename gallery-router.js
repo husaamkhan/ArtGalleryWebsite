@@ -71,7 +71,7 @@ async function renderArtpiecePage(req, res, next) {
         console.log("Searching for artpiece with title: " + req.params.title);
         // Find the artpiece from the gallery
         const artpiece = await Gallery.findOne({ title: req.params.title });
-        console.log(artpiece);
+
         if (artpiece) {
             console.log("Found artpiece with title: " + artpiece.title);
             res.status(200).render('artpiece', { artpiece });
@@ -267,8 +267,6 @@ async function deleteReview(req, res, next) {
     try {
         console.log("Searching for artpiece with title: " + req.params.title);
         let artpiece = await Gallery.findOne({ title: req.params.title });
-
-        console.log(artpiece);
 
         if (artpiece) {
             console.log("Artpiece with title " + artpiece.title + " found, deleting review");

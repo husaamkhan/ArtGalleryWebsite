@@ -32,11 +32,13 @@ let userRouter = require('./user-router');
 app.use('/user', userRouter);
 let galleryRouter = require('./gallery-router');
 app.use('/gallery', galleryRouter);
-// let workshopRouter = require('./workshop-router');
-// app.use('/workshops', workshopRouter);
  
 app.get('/', sendLogInPage);
 app.get('/register', sendRegistrationPage);
+
+app.use((req, res, next) => {
+    res.status(404).render('page-not-found');
+});
 
 async function sendLogInPage(req, res, next) {
     if (req.session.loggedIn) { // If the user is already logged in, redirect them to their dashboard rather than making them log in again

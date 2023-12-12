@@ -361,6 +361,10 @@ function loadProfilePage(username) {
                     followButton.addEventListener('click', function() { followUser(username) });
                 }
             }
+            else if (this.readyState == 4 && this.status == 404) {
+                alert("User not found! Redirecting to log in page");
+                location.href = '/';
+            }
         }
         xhttp.open('GET', '/user/get-following');
         xhttp.send();
@@ -397,11 +401,11 @@ function unfollowUser(username) {
     xhttp.send();
 }
 
-function loadSearchPage() {
-    document.getElementById('search-button').addEventListener('click', function() { search() });
+function loadSearchArtPage() {
+    document.getElementById('search-button').addEventListener('click', function() { searchArt() });
 }
 
-function search() {
+function searchArt() {
     let search = document.getElementById('search-input').value;
     let category = document.getElementById('category-select').value;
     let medium = document.getElementById('medium-input').value;
@@ -412,63 +416,168 @@ function search() {
     if (medium === '') { medium = 'All' };
     if (artist === '') { artist = 'All' };
 
-    location.href = `/gallery/search/${search}/${category}/${medium}/${artist}?page=0`;
-
-    // const xhttp = new XMLHttpRequest();
-    // xhttp.onreadystatechange = function() {
-    //     if (this.readyState == 4 && this.status == 200) {
-    //         // document.getElementById('result-container').innerHTML = this.responseText;
-    //         let result = JSON.parse(this.responseText).result;
-    //         let resultContainer = document.getElementById('result-container');
-
-    //         if (result.length == 0) {
-    //             let p = document.createElement('p');
-    //             p.textContent = 'No matching artpieces';
-    //             resultContainer.appendChild(p);
-    //         }
-    //         else {
-    //             let ul = document.createElement('ul');
-    //             for (let artpiece of result) {
-    //                 let li = document.createElement('li');
-
-    //                 let a = document.createElement('a');
-    //                 a.href = `/gallery/view-art/${artpiece.title}`;
-    //                 a.textContent = artpiece.title;
-
-    //                 li.appendChild(a);
-    //                 ul.appendChild(li);
-    //             }
-    //             resultContainer.appendChild(ul);
-
-    //             let previousButton = document.createElement('button');
-    //             previousButton.textContent = 'Previous';
-    //             previousButton.addEventListener('click', function() { getPreviousResult() });
-
-    //             let nextButton = document.createElement('button');
-    //             nextButton.textContent = 'Next';
-    //             nextButton.addEventListener('click', function() { getNextResult() });
-    //         }
-    //     }
-    // }
-    // xhttp.open('GET', `/gallery/search/${search}/${category}/${medium}/${artist}?page=${page}`);
-    // xhttp.send(JSON.stringify);
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            renderArtResult(JSON.parse(this.responseText), search, category, medium, artist, 0)
+        }
+        else if (this.readyState == 4 && this.status == 404) {
+            document.getElementById('result-container').innerHTML = '';
+            let p = document.createElement('p');
+            p.textContent = 'No matching artpieces';
+            document.getElementById('result-container').appendChild(p);
+        }
+    }
+    xhttp.open('GET', `/gallery/search/${search}/${category}/${medium}/${artist}/0`);
+    xhttp.send();
 }
 
-function loadResultPage() {
-    let previousButton = document.getElementById('previous-button');
-    let nextButton = document.getElementById('next-button');
+function renderArtResult(result, search, category, medium, artist, page) {
+    let resultContainer = document.getElementById('result-container');
+    resultContainer.innerHTML = '';
 
-    // If there is a result that was loaded, the buttons will not be undefined. If the previous button exists, the next one does too
-    if (previousButton) {
-        previousButton.addEventListener('click', function() { getPreviousResult() });
-        nextButton.addEventListener('click', function() { getNextResult() });
+    let ul = document.createElement('ul');
+    for (let artpiece of result) {
+        let li = document.createElement('li');
+
+        let a = document.createElement('a');
+        a.href = `/gallery/view-art/${artpiece.title}`;
+        a.textContent = artpiece.title;
+
+        li.appendChild(a);
+        ul.appendChild(li);
+    }
+    resultContainer.appendChild(ul);
+
+    let previousButton = document.createElement('button');
+    previousButton.textContent = 'Previous';
+    previousButton.addEventListener('click', function() { getPreviousArtResult(search, category, medium, artist, page) });
+
+    let nextButton = document.createElement('button');
+    nextButton.textContent = 'Next';
+    nextButton.addEventListener('click', function() { getNextArtResult(search, category, medium, artist, page) });
+
+    resultContainer.appendChild(previousButton);
+    resultContainer.appendChild(nextButton);
+}
+
+function getPreviousArtResult(search, category, medium, artist, page) {
+    page--;
+
+    if (page >= 0) {
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                renderArtResult(JSON.parse(this.responseText), search, category, medium, artist, page);
+            }
+        }
+        xhttp.open('GET', `/gallery/search/${search}/${category}/${medium}/${artist}/${page}`);
+        xhttp.send();
     }
 }
 
-function getPreviousResult() {
-    
+function getNextArtResult(search, category, medium, artist, page) {
+    page++;
+
+    let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                renderArtResult(JSON.parse(this.responseText), search, category, medium, artist, page);
+            }
+        }
+        xhttp.open('GET', `/gallery/search/${search}/${category}/${medium}/${artist}/${page}`);
+        xhttp.send();
 }
 
-function getNextResult() {
+function loadArtworkPage() {
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            renderArtResult(JSON.parse(this.responseText), 'All', 'All', 'All', 'All', 0);
+        }
+    }
+    xhttp.open('GET', '/gallery/search/All/All/All/All/0');
+    xhttp.send();
+}
 
+function loadSearchArtistPage() {
+    document.getElementById('search-button').addEventListener('click', function() { searchArtist() });
+}
+
+function searchArtist() {
+    let search = document.getElementById('search-input').value;
+
+    if (search === '') { search = 'All' };
+
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            renderArtistResult(JSON.parse(this.responseText), search, 0)
+        }
+        else if (this.readyState == 4 && this.status == 404) {
+            document.getElementById('result-container').innerHTML = '';
+            let p = document.createElement('p');
+            p.textContent = 'No matching artists';
+            document.getElementById('result-container').appendChild(p);
+        }
+    }
+    xhttp.open('GET', `/user/search/${search}/0`);
+    xhttp.send();
+}
+
+function renderArtistResult(result, search, page) {
+    let resultContainer = document.getElementById('result-container');
+    resultContainer.innerHTML = '';
+
+    let ul = document.createElement('ul');
+    for (let artist of result) {
+        let li = document.createElement('li');
+
+        let a = document.createElement('a');
+        a.href = `/user/profile/${artist.username}`;
+        a.textContent = artist.username;
+
+        li.appendChild(a);
+        ul.appendChild(li);
+    }
+    resultContainer.appendChild(ul);
+
+    let previousButton = document.createElement('button');
+    previousButton.textContent = 'Previous';
+    previousButton.addEventListener('click', function() { getPreviousArtistResult(search, page) });
+
+    let nextButton = document.createElement('button');
+    nextButton.textContent = 'Next';
+    nextButton.addEventListener('click', function() { getNextArtistResult(search, page) });
+
+    resultContainer.appendChild(previousButton);
+    resultContainer.appendChild(nextButton);
+}
+
+function getPreviousArtistResult(search, page) {
+    page--;
+
+    if (page >= 0) {
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                renderArtistResult(JSON.parse(this.responseText), search, page);
+            }
+        }
+        xhttp.open('GET', `/user/search/${search}/${page}`);
+        xhttp.send();
+    }
+}
+
+function getNextArtistResult(search, page) {
+    page++;
+
+    let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                renderArtistResult(JSON.parse(this.responseText), search, page);
+            }
+        }
+        xhttp.open('GET', `/user/search/${search}/${page}`);
+        xhttp.send();
 }

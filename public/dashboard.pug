@@ -25,18 +25,40 @@ html
                     li
                         a(href='/gallery/add-artwork') Post an artpiece
         
-        if artist
-            h4 Your artwork
-            if artwork.length == 0
-                p No posts yet!
-            else
-                ul#artwork-list
-                    each artpiece in artwork
+        //- if artist
+        //-     h4 Your artwork
+        //-     if artwork.length == 0
+        //-         p No posts yet!
+        //-     else
+        //-         ul#artwork-list
+        //-             each artpiece in artwork
+        //-                 li
+        //-                     a(href=`/gallery/view-art/${artpiece}`)=artpiece
+                            
+        div(class='dashboard-row')
+            div(class='left-container')
+                h4 Your artwork
+                ul
+                if artwork.length == 0
+                    li No posts yet!
+                else
+                    ul#artwork-list
+                        each artpiece in artwork
+                            li
+                                a(href=`/gallery/view-art/${artpiece}`)=artpiece
+            
+            div(class='right-container')
+                h4 Your reviews
+                ul
+                if reviews.length == 0
+                        li No reviews yet!
+                else
+                    each review in reviews
                         li
-                            a(href=`/gallery/view-art/${artpiece}`)=artpiece
+                            a(href=`/gallery/view-art/${review}`)=review
         
-        div(class='dashboard-bottom')
-            div(class='notifications-container')
+        div(class='dashboard-row')
+            div(class='left-container')
                 h4 Your notifications
                 ul
                 if notifications.length == 0
@@ -45,7 +67,7 @@ html
                     each notification in notifications
                         li=notification
 
-            div(class='likes-container')
+            div(class='right-container')
                 h4 Your likes
                 if likes.length == 0
                     li No likes yet!
